@@ -13,7 +13,7 @@ body {
 }
 .navbar .LogoText {
   color: black;
-  font-size: 1.25em;
+  font-size: 1.6em;
   font-weight: bold;
 }
 .navbar .LogoText span {
@@ -51,19 +51,32 @@ body {
   padding: 0.8em 1.5em;
   border-radius: 1em;
 }
-.text-and-recommendations .left-column .copy-button {
-  text-align: center;
-  display: block;
-  margin: 1em auto;
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  background: #007AF3;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 1em;
-  cursor: pointer;
+
+.text-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
+
+.copy-button, .submit-button {
+  width: auto;
+  padding: 0 20px;
+  height: 50px;
+  border-radius: 1.5em;
+  background: #007AF3;
+  color: #fff;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.copy-button:hover, .submit-button:hover {
+  background-color: #555;
+}
+
+
 .text-and-recommendations .right-column {
   width: 30%;
   float: right;
