@@ -8,11 +8,41 @@ let service_url = "http://127.0.0.1:5000/";
 let errors = []
 let originalText = "dette er din tekst"
 
-async function get_text() {
-  var text = await chrome.storage.local.get(["word"]).then((result) => {
-    originalText = result.word;
-  });
+function splitWords(sentence) {
+  sentence = sentence.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+  const words = sentence.split(' '); // split the sentence into words
+  let result = []; // initialize the result list
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    if (word.includes('<div>')) { // check if the word contains <div>
+      const [left, right] = word.split('<div>'); // split the word into two parts
+      result.push(left + '<div>'); // add the left part with <div> to the result list
+      result.push(right); // add the right part to the result list
+    } else {
+      result.push(word); // add the word to the result list as is
+    }
+  }
+  result = result.filter(str => str !== "");
+  console.log("result", result)
+  return result; // return the result list
 }
+
+function get_text() {
+  const text = document.querySelector(".text");
+  const html = text.innerHTML.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+  console.log(html);
+  return html;
+}
+
+
+const correctTextButton = document.querySelector(".submit-button")
+
+correctTextButton.addEventListener("click", () => {
+  const rightColumn = document.querySelector(".right-column");
+  rightColumn.innerHTML = "";
+  correctTextButton.textContent = "Retter din tekst...";
+  main();
+})
 
 const copyButton = document.querySelector(".copy-button");
 
@@ -28,7 +58,10 @@ copyButton.addEventListener("click", () => {
 });
 
 async function fetchData() {
-  await get_text();
+  originalText = await get_text();
+  if (splitWords(originalText).length > 100) {
+    return "error"
+  }
   let object = {"sentence": originalText};
   const response = await fetch(service_url, {
     method: 'POST',
@@ -39,136 +72,114 @@ async function fetchData() {
   });
   const data = await response.text();
   errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));;
+  return "succes"
 }
 
 async function main() {
 
-
-  await fetchData();
-  console.log("Fetch is complete!");
+  state = await fetchData();
+  if (state === "error") {
+    error_message = document.querySelector(".error-message")
+    error_message.innerHTML = "Vi kan desværre ikke rette over 100 ord på nuværende tidspunkt. Vi beklager meget!"
+  }
 
   let corrected_errors = []
 
-const words = originalText.split(" ");
-const newLineIndices = [];
-for (let i = 0; i < words.length - 1; i++) {
-  if (words[i] === "" && words[i + 1] === "") {
-    newLineIndices.push(i);
-    words.splice(i, 2);
-    i--;
+  const words = splitWords(document.querySelector(".text").innerHTML)
+
+  for (let i = 0; i < errors.length; i++) {
+      const error = errors[i];
+      const index = error[2];
+      words[index] = `<span style="color: red">${words[index]}</span>`;
+    }
+
+  const currentText = document.querySelector(".text")
+  currentText.innerHTML = words.join(" ")
+
+  const rightColumn = document.querySelector(".right-column")
+
+  function checkClearMessage() {
+      if (rightColumn.childElementCount === 0) {
+          allClearText = document.createElement("div")
+          allClearText.classList.add("allClearText")
+          allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
+          rightColumn.appendChild(allClearText)
+        }
   }
-}
 
-for (let i = 0; i < errors.length; i++) {
-    const error = errors[i];
-    const index = error[2];
-    words[index] = `<span style="color: red">${words[index]}</span>`;
+  if (errors.length === 0) {
+      allClearText = document.createElement("div")
+      allClearText.classList.add("allClearText")
+      allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
+      rightColumn.appendChild(allClearText)
   }
 
+  for (let i = 0; i < errors.length; i++) {
+      const error = errors[i];
+      
+      const errorMessage = document.createElement("div");
+      errorMessage.classList.add("error-message");
 
-console.log(newLineIndices)
-function add_new_lines(words) {
-  words_with_new_lines = words
-  for (let i = newLineIndices.length - 1; i >= 0; i--) {
-    const index = newLineIndices[i];
-    words_with_new_lines.splice(index, 0, "<br>");
-  }
-  return words_with_new_lines.join(" ");
-}
+      const closeButton = document.createElement("div");
+      closeButton.classList.add("close-button");
+      closeButton.textContent = "X";
+      errorMessage.append(closeButton)
 
-console.log(words)
-const newSentence = add_new_lines(words);
-const currentText = document.querySelector(".text")
-currentText.innerHTML = newSentence
-
-const rightColumn = document.querySelector(".right-column")
-
-function checkClearMessage() {
-    if (rightColumn.childElementCount === 0) {
-        allClearText = document.createElement("div")
-        allClearText.classList.add("allClearText")
-        allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
-        rightColumn.appendChild(allClearText)
-      }
-}
-
-if (errors.length === 0) {
-    allClearText = document.createElement("div")
-    allClearText.classList.add("allClearText")
-    allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
-    rightColumn.appendChild(allClearText)
-}
-
-for (let i = 0; i < errors.length; i++) {
-    const error = errors[i];
-    
-    const errorMessage = document.createElement("div");
-    errorMessage.classList.add("error-message");
-
-    const closeButton = document.createElement("div");
-    closeButton.classList.add("close-button");
-    closeButton.textContent = "X";
-    errorMessage.append(closeButton)
-
-    closeButton.addEventListener("click", function() {
-        const index = errors[i][2];
-        const words = currentText.textContent.split(" ");
-        corrected_errors.push(i)
-        for (let j = 0; j < errors.length; j++) {
-            if (j !== i && !corrected_errors.includes(j)) {
-              const errorIndex = errors[j][2];
-              words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
+      closeButton.addEventListener("click", function() {
+          const index = errors[i][2];
+          const words = splitWords(get_text())
+          corrected_errors.push(i)
+          for (let j = 0; j < errors.length; j++) {
+              if (j !== i && !corrected_errors.includes(j)) {
+                const errorIndex = errors[j][2];
+                words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
+              }
             }
-          }
-        const newSentence = add_new_lines(words);
-        currentText.innerHTML = newSentence;
-        errorMessage.remove();
-        checkClearMessage();
-      });
+          currentText.innerHTML = words.join(" ")
+          errorMessage.remove();
+          checkClearMessage();
+        });
 
-    const wrongWord = document.createElement("div");
-    wrongWord.classList.add("wrongWord")
-    wrongWord.textContent = error[0]
-    errorMessage.append(wrongWord)
+      const wrongWord = document.createElement("div");
+      wrongWord.classList.add("wrongWord")
+      wrongWord.textContent = error[0].replace(/<\/?div>/g, "");
+      errorMessage.append(wrongWord)
 
-    const arrow = document.createElement("div");
-    arrow.classList.add("arrow")
-    arrow.innerHTML = "&#8594;"
-    errorMessage.append(arrow)
+      const arrow = document.createElement("div");
+      arrow.classList.add("arrow")
+      arrow.innerHTML = "&#8594;"
+      errorMessage.append(arrow)
 
-    const correctWord = document.createElement("div");
-    correctWord.classList.add("correctWord")
-    correctWord.textContent = error[1]
-    errorMessage.append(correctWord)
+      const correctWord = document.createElement("div");
+      correctWord.classList.add("correctWord")
+      correctWord.textContent = error[1].replace(/<\/?div>/g, "");
+      errorMessage.append(correctWord)
 
-    correctWord.addEventListener("click", function() {
-        const index = errors[i][2];
-        const words = currentText.textContent.split(" ").filter(str => str !== "");
-        words[index] = errors[i][1];
-        console.log(words)
-        corrected_errors.push(i)
-        for (let j = 0; j < errors.length; j++) {
-            if (j !== i && !corrected_errors.includes(j)) {
-              const errorIndex = errors[j][2];
-              words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
+      correctWord.addEventListener("click", function() {
+          const index = errors[i][2];
+          const words = splitWords(get_text())
+          words[index] = errors[i][1];
+          corrected_errors.push(i)
+          for (let j = 0; j < errors.length; j++) {
+              if (j !== i && !corrected_errors.includes(j)) {
+                const errorIndex = errors[j][2];
+                words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
+              }
             }
-          }
-        const newSentence = add_new_lines(words);
-        console.log(newSentence)
-        currentText.innerHTML = newSentence;
-        errorMessage.remove();
-        checkClearMessage();
-      });
+          console.log(words)
+          currentText.innerHTML = words.join(" ")
+          errorMessage.remove();
+          checkClearMessage();
+        });
 
-    const errorElement = document.createElement("div");
-    errorElement.classList.add("description");
-    errorElement.textContent = error[3]
-    errorMessage.append(errorElement)
+      const errorElement = document.createElement("div");
+      errorElement.classList.add("description");
+      errorElement.textContent = error[3]
+      errorMessage.append(errorElement)
 
-    rightColumn.appendChild(errorMessage)
+      rightColumn.appendChild(errorMessage)
+  }
+
+correctTextButton.textContent = "Ret min tekst";
 }
-
-}
-
-main();
 
