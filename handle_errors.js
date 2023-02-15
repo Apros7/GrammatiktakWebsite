@@ -89,7 +89,7 @@ copyButton.addEventListener("click", () => {
 });
 
 async function fetchData() {
-  if (splitWords(get_text()).length > 100) {
+  if (splitWords(get_text()).length > 1000) {
     return "error"
   }
   let object = {"sentence": get_text()};
@@ -110,7 +110,7 @@ async function main() {
   state = await fetchData();
   if (state === "error") {
     error_message = document.querySelector(".error-message")
-    error_message.innerHTML = "Vi kan desværre ikke rette over 100 ord på nuværende tidspunkt. Vi beklager meget!"
+    error_message.innerHTML = "Vi kan desværre ikke rette over 1000 ord på nuværende tidspunkt. Vi beklager meget!"
   }
 
   let corrected_errors = []
