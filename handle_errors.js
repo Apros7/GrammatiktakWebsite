@@ -23,17 +23,25 @@ function splitWords(sentence) {
     }
   }
   result = result.filter(str => str !== "");
-  console.log("result", result)
   return result; // return the result list
 }
 
 function get_text() {
   const text = document.querySelector(".text");
-  const html = text.innerHTML.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
-  console.log(html);
+  let html = text.innerHTML.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+  let isFirstBr = true;
+  html = html.replace(/<br>/g, match => {
+    if (isFirstBr) {
+      isFirstBr = false;
+      return '<div>';
+    } else {
+      return '</div><div>';
+    }
+  });
+  html += '</div>';
   return html;
 }
-
+// function CleanHTML -> To clean html when copied in
 
 const correctTextButton = document.querySelector(".submit-button")
 
@@ -58,11 +66,10 @@ copyButton.addEventListener("click", () => {
 });
 
 async function fetchData() {
-  originalText = await get_text();
-  if (splitWords(originalText).length > 100) {
+  if (splitWords(get_text()).length > 100) {
     return "error"
   }
-  let object = {"sentence": originalText};
+  let object = {"sentence": get_text()};
   const response = await fetch(service_url, {
     method: 'POST',
     headers: {
@@ -85,7 +92,7 @@ async function main() {
 
   let corrected_errors = []
 
-  const words = splitWords(document.querySelector(".text").innerHTML)
+  const words = splitWords(get_text())
 
   for (let i = 0; i < errors.length; i++) {
       const error = errors[i];
@@ -166,7 +173,6 @@ async function main() {
                 words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
               }
             }
-          console.log(words)
           currentText.innerHTML = words.join(" ")
           errorMessage.remove();
           checkClearMessage();
