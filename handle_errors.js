@@ -1,7 +1,7 @@
 
 
-let service_url = "http://127.0.0.1:5000/";
-// let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+// let service_url = "http://127.0.0.1:5000/";
+let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 //let errors = [["he", "hej", 0, "beskrivelse"], ["heder", "hedder", 2, "beskrivelse"], ["lucas", "Lucas", 3, "beskrivelse"]]
 
 
