@@ -52,6 +52,20 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
+const text = document.querySelector(".text")
+const placeholder = document.querySelector(".placeholder")
+
+text.addEventListener('input', () => {
+  // If the editable div is empty, show the overlay element
+  if (text.textContent.trim() === '') {
+    placeholder.style.display = 'flex';
+    text.style.marginTop = "-3.2em";
+  } else {
+    placeholder.style.display = 'none';
+    text.style.marginTop = "0";
+  }
+});
+
 const correctTextButton = document.querySelector(".submit-button")
 
 correctTextButton.addEventListener("click", () => {
