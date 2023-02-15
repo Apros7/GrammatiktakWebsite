@@ -41,7 +41,16 @@ function get_text() {
   html += '</div>';
   return html;
 }
-// function CleanHTML -> To clean html when copied in
+
+document.addEventListener("DOMContentLoaded", function() {
+  var text = document.querySelector(".text");
+  text.addEventListener("paste", function(e) {
+    e.preventDefault();
+    var current_text = e.clipboardData.getData("text/plain");
+    var html = current_text.replace(/\n/g, "<br>");
+    document.execCommand("insertHTML", false, html);
+  });
+});
 
 const correctTextButton = document.querySelector(".submit-button")
 
