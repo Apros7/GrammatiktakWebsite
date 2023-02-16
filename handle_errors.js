@@ -1,7 +1,7 @@
 
 
-// let service_url = "http://127.0.0.1:5000/";
-let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+let service_url = "http://127.0.0.1:5000/";
+//let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 //let errors = [["he", "hej", 0, "beskrivelse"], ["heder", "hedder", 2, "beskrivelse"], ["lucas", "Lucas", 3, "beskrivelse"]]
 
 
@@ -10,18 +10,48 @@ let originalText = "dette er din tekst"
 
 function splitWords(sentence) {
   sentence = sentence.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
-  const words = sentence.split(' '); // split the sentence into words
-  let result = []; // initialize the result list
+  let words = sentence.split(' '); 
+  let true_words = [];
+  let result = []; 
+  const symbols = ".,!?\";:"
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
+    if (symbols.includes(word[0]) || symbols.includes(word[-1])) {
+      if (i == 0) {
+        words[1] = word + " " + words[i]
+      } else {
+        const lastElement = true_words[true_words.length - 1]
+        let elements = [lastElement]
+        let pushWord = ""
+        if (symbols.includes(word[0])) {
+          elements.push(word[0]) 
+          pushWord = word.substring(1)
+        } else {
+          elements.push(word[-1])
+          pushWord = word.substring(0, word.length - 1)
+        }
+        true_words.splice(true_words.length - 1, 1, elements.join(" "))
+        true_words.push(pushWord)
+      }
+    } else {
+      true_words.push(word)
+    }
+  }
+  for (let i = 0; i < true_words.length; i++) {
+    const word = true_words[i];
     if (word.includes('<div>')) { // check if the word contains <div>
       const [left, right] = word.split('<div>'); // split the word into two parts
-      result.push(left + '<div>'); // add the left part with <div> to the result list
-      result.push(right); // add the right part to the result list
+      if (left === "" || right === "") {
+        result.push(word)
+      } else {
+        result.push(left + '<div>'); // add the left part with <div> to the result list
+        result.push(right); // add the right part to the result list
+      }
     } else {
       result.push(word); // add the word to the result list as is
     }
   }
+  console.log(result)
   result = result.filter(str => str !== "");
   return result; // return the result list
 }
