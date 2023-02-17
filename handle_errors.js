@@ -1,5 +1,5 @@
 
-// let service_url = "http://127.0.0.1:5000/";
+//let service_url = "http://127.0.0.1:5000/";
 let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
@@ -36,12 +36,12 @@ function splitWords(sentence) {
   }
   for (let i = 0; i < true_words.length; i++) {
     const word = true_words[i];
-    if (word.includes('<div>')) { // check if the word contains <div>
-      const [left, right] = word.split('<div>'); // split the word into two parts
+    if (word.includes('<br>')) { // check if the word contains <div>
+      const [left, right] = word.split('<br>'); // split the word into two parts
       if (left === "" || right === "") {
         result.push(word)
       } else {
-        result.push(left + '<div>'); // add the left part with <div> to the result list
+        result.push(left + '<br>'); // add the left part with <div> to the result list
         result.push(right); // add the right part to the result list
       }
     } else {
@@ -56,16 +56,12 @@ function splitWords(sentence) {
 function get_text() {
   const text = document.querySelector(".text");
   let html = text.innerHTML.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
-  let isFirstBr = true;
-  html = html.replace(/<br>/g, match => {
-    if (isFirstBr) {
-      isFirstBr = false;
-      return '<div>';
-    } else {
-      return '</div><div>';
-    }
+  html = html.replace(/<div>/g, match => {
+    return "<br>"
   });
-  html += '</div>';
+  html = html.replace(/<\/div>/g, '')
+  html = html.replace(/&nbsp;/g, '')
+  console.log(html)
   return html;
 }
 
@@ -200,7 +196,7 @@ async function main() {
 
       const wrongWord = document.createElement("div");
       wrongWord.classList.add("wrongWord")
-      wrongWord.textContent = error[0].replace(/<\/?div>/g, "");
+      wrongWord.textContent = error[0].replace(/<br>/g, "");
       errorMessage.append(wrongWord)
 
       const arrow = document.createElement("div");
@@ -210,7 +206,7 @@ async function main() {
 
       const correctWord = document.createElement("div");
       correctWord.classList.add("correctWord")
-      correctWord.textContent = error[1].replace(/<\/?div>/g, "");
+      correctWord.textContent = error[1].replace(/<br>/g, "");
       errorMessage.append(correctWord)
 
       correctWord.addEventListener("click", function() {
