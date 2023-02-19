@@ -62,7 +62,6 @@ function get_text() {
   });
   html = html.replace(/<\/div>/g, '');
   html = html.replace(/&nbsp;/g, '');
-  console.log(html);
   return html;
 }
 
@@ -196,7 +195,6 @@ async function main() {
                 words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
               }
             }
-          console.log(words)
           currentText.innerHTML = words.join(" ")
           errorMessage.remove();
           checkClearMessage();
