@@ -1,6 +1,6 @@
 
-//let service_url = "http://127.0.0.1:5000/";
-let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+let service_url = "http://127.0.0.1:5000/";
+//let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
@@ -36,33 +36,41 @@ function splitWords(sentence) {
   }
   for (let i = 0; i < true_words.length; i++) {
     const word = true_words[i];
-    if (word.includes('<br>')) { // check if the word contains <div>
-      const [left, right] = word.split('<br>'); // split the word into two parts
+    if (word.includes('<br>')) { 
+      const [left, right] = word.split('<br>');
       if (left === "" || right === "") {
         result.push(word)
       } else {
-        result.push(left + '<br>'); // add the left part with <div> to the result list
-        result.push(right); // add the right part to the result list
+        result.push(left + '<br>'); 
+        result.push(right); 
       }
     } else {
-      result.push(word); // add the word to the result list as is
+      result.push(word); 
     }
   }
   console.log(result)
   result = result.filter(str => str !== "");
-  return result; // return the result list
+  return result; 
 }
 
 function get_text() {
   const text = document.querySelector(".text");
-  let html = text.innerHTML.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+  const current_text = check_font();
+  let html = current_text.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
   html = html.replace(/<div>/g, match => {
     return "<br>"
   });
-  html = html.replace(/<\/div>/g, '')
-  html = html.replace(/&nbsp;/g, '')
-  console.log(html)
+  html = html.replace(/<\/div>/g, '');
+  html = html.replace(/&nbsp;/g, '');
+  console.log(html);
   return html;
+}
+
+function check_font() {
+  var text = document.querySelector(".text");
+  var current_text = text.innerHTML.replace(/<font.*?>/g, '').replace(/<\/font>/g, '');
+  text.innerHTML = current_text;
+  return current_text;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
