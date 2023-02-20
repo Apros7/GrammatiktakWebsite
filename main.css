@@ -92,6 +92,7 @@ body {
 .text-and-recommendations .right-column {
   width: 30%;
   float: right;
+  margin-bottom: 2em;
 }
 .text-and-recommendations .right-column .allClearText {
   padding: 1em 0em 1em 1em;
