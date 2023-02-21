@@ -99,7 +99,7 @@ const correctTextButton = document.querySelector(".submit-button")
 
 function correctText() {
   const rightColumn = document.querySelector(".right-column");
-  const textWhenCorrection = splitWords(get_text())
+  let textWhenCorrection = splitWords(get_text())
   rightColumn.innerHTML = "";
   correctTextButton.textContent = "Retter din tekst...";
   main(textWhenCorrection);
@@ -252,7 +252,8 @@ async function main(textWhenCorrection) {
                 words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
               }
             }
-          currentText.innerHTML = words.join(" ")
+          textWhenCorrection = splitWords(words.join(" "));
+          currentText.innerHTML = words.join(" ");
           errorMessage.remove();
           checkClearMessage();
         });
