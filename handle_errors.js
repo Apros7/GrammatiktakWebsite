@@ -189,6 +189,12 @@ async function main() {
           const index = errors[i][2];
           const words = splitWords(get_text())
           corrected_errors.push(i)
+          if (errors[i][3] === `Der skal være punktum efter "${errors[i][0]}".`)
+            corrected_errors.push(i+1)
+            const nextErrorMessage = errorMessage.nextElementSibling;
+            if (nextErrorMessage) {
+              nextErrorMessage.remove();
+            }
           for (let j = 0; j < errors.length; j++) {
               if (j !== i && !corrected_errors.includes(j)) {
                 const errorIndex = errors[j][2];
