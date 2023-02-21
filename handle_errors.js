@@ -48,7 +48,6 @@ function splitWords(sentence) {
       result.push(word); 
     }
   }
-  console.log(result)
   result = result.filter(str => str !== "");
   return result; 
 }
@@ -98,11 +97,16 @@ text.addEventListener('input', () => {
 
 const correctTextButton = document.querySelector(".submit-button")
 
-correctTextButton.addEventListener("click", () => {
+function correctText() {
   const rightColumn = document.querySelector(".right-column");
+  const textWhenCorrection = splitWords(get_text())
   rightColumn.innerHTML = "";
   correctTextButton.textContent = "Retter din tekst...";
-  main();
+  main(textWhenCorrection);
+}
+
+correctTextButton.addEventListener("click", () => {
+  correctText();
 })
 
 const copyButton = document.querySelector(".copy-button");
@@ -135,7 +139,7 @@ async function fetchData() {
   return "succes"
 }
 
-async function main() {
+async function main(textWhenCorrection) {
 
   state = await fetchData();
   if (state === "error") {
@@ -188,6 +192,10 @@ async function main() {
       closeButton.addEventListener("click", function() {
           const index = errors[i][2];
           const words = splitWords(get_text())
+          if (textWhenCorrection !== words) {
+            correctText();
+            return;
+          }
           corrected_errors.push(i)
           if (errors[i][3] === `Der skal være punktum efter "${errors[i][0]}".`)
             corrected_errors.push(i+1)
@@ -224,6 +232,10 @@ async function main() {
       correctWord.addEventListener("click", function() {
           const index = errors[i][2];
           const words = splitWords(get_text())
+          if (textWhenCorrection !== words) {
+            correctText();
+            return;
+          }
           words[index] = errors[i][1];
           corrected_errors.push(i)
           for (let j = 0; j < errors.length; j++) {
