@@ -105,6 +105,14 @@ function correctText() {
   main(textWhenCorrection);
 }
 
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
 correctTextButton.addEventListener("click", () => {
   correctText();
 })
@@ -192,7 +200,7 @@ async function main(textWhenCorrection) {
       closeButton.addEventListener("click", function() {
           const index = errors[i][2];
           const words = splitWords(get_text())
-          if (textWhenCorrection !== words) {
+          if (!arraysEqual(textWhenCorrection, words)) {
             correctText();
             return;
           }
@@ -232,7 +240,7 @@ async function main(textWhenCorrection) {
       correctWord.addEventListener("click", function() {
           const index = errors[i][2];
           const words = splitWords(get_text())
-          if (textWhenCorrection !== words) {
+          if (!arraysEqual(textWhenCorrection, words)) {
             correctText();
             return;
           }
