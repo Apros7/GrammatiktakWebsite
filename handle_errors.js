@@ -225,8 +225,7 @@ async function main(textWhenCorrection) {
 
       const wrongWord = document.createElement("div");
       wrongWord.classList.add("wrongWord")
-      wrongWord.textContent = words[error[2]].replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
-      //wrongWord.textContent = error[0].replace(/<br>/g, "");
+      wrongWord.textContent = words[error[2]].replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '').replace(/<br>/g, "");
       errorMessage.append(wrongWord)
 
       const arrow = document.createElement("div");
