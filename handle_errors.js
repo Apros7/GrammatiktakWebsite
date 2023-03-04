@@ -1,11 +1,15 @@
 
-//let service_url = "http://127.0.0.1:5000/";
-let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+let service_url = "http://127.0.0.1:5000/";
+//let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
 
 function splitWords(sentence) {
+  return sentence
+}
+
+function splitWords2(sentence) {
   sentence = sentence.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
   let words = sentence.split(' '); 
   let true_words = [];
@@ -71,6 +75,33 @@ function check_font() {
   return current_text;
 }
 
+function correct_sentence(sentence, string_to_put_in, start_index, end_index, errors) {
+  const corrected_sentence = sentence.slice(0, start_index) + string_to_put_in + sentence.slice(end_index)
+  if (end_index !== start_index + string_to_put_in.length) {
+    const difference = start_index + string_to_put_in.length - end_index
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i][2][0] > start_index) {
+        errors[i][2][0] = errors[i][2][0] + difference
+        errors[i][2][1] = errors[i][2][1] + difference
+      }
+    }
+   }
+  return [corrected_sentence, errors]
+}
+
+function make_sentence_red(sentence, string_to_put_in, indexes) {
+  let result = "";
+  let previousIndex = 0;
+  for (let i = 0; i < indexes.length; i++) {
+    const [start, end] = indexes[i];
+    result += sentence.slice(previousIndex, start);
+    result += `<span style="color: red">${string_to_put_in[i]}</span>`;
+    previousIndex = end;
+  }
+  result += sentence.slice(previousIndex);
+  return result;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   var text = document.querySelector(".text");
   text.addEventListener("paste", function(e) {
@@ -131,7 +162,7 @@ copyButton.addEventListener("click", () => {
 });
 
 async function fetchData() {
-  if (splitWords(get_text()).length > 1000) {
+  if (splitWords(get_text()).length > 5000) {
     return "error"
   }
   let object = {"sentence": get_text()};
@@ -144,7 +175,7 @@ async function fetchData() {
   });
   const data = await response.text();
   errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));;
-  return "succes"
+  return "success"
 }
 
 async function main(textWhenCorrection) {
@@ -152,21 +183,26 @@ async function main(textWhenCorrection) {
   state = await fetchData();
   if (state === "error") {
     error_message = document.querySelector(".error-message")
-    error_message.innerHTML = "Vi kan desværre ikke rette over 1000 ord på nuværende tidspunkt. Vi beklager meget!"
+    error_message.innerHTML = "Vi kan desværre ikke rette over 5000 tegn på nuværende tidspunkt. Vi beklager meget!"
   }
 
   let corrected_errors = []
 
-  const words = splitWords(get_text())
+  let sentence = splitWords(get_text())
+  let str_to_put_in = []
+  let indexes = []
 
   for (let i = 0; i < errors.length; i++) {
-      const error = errors[i];
-      const index = error[2];
-      words[index] = `<span style="color: red">${words[index]}</span>`;
-    }
+      const word = errors[i][0];
+      const lower_bound = errors[i][2][0]
+      const upper_bound = errors[i][2][1]
+      str_to_put_in.push(`<span style="color: red">${word}</span>`);
+      indexes.push([lower_bound, upper_bound])
+  }
 
+  sentence = make_sentence_red(sentence, str_to_put_in, indexes);
   const currentText = document.querySelector(".text")
-  currentText.innerHTML = words.join(" ")
+  currentText.innerHTML = sentence
 
   const rightColumn = document.querySelector(".right-column")
 
@@ -198,34 +234,33 @@ async function main(textWhenCorrection) {
       errorMessage.append(closeButton)
 
       closeButton.addEventListener("click", function() {
-          const index = errors[i][2];
-          const words = splitWords(get_text())
-          if (!arraysEqual(textWhenCorrection, words)) {
-            correctText();
-            return;
-          }
-          corrected_errors.push(i)
-          if (errors[i][3] === `Der skal være punktum efter "${errors[i][0]}".`) {
-            corrected_errors.push(i+1)
-            const nextErrorMessage = errorMessage.nextElementSibling;
-            if (nextErrorMessage) {
-              nextErrorMessage.remove();
+        const sentence = splitWords(get_text())
+        if (!(textWhenCorrection === sentence)) {
+          correctText();
+          return;
+        }
+        let str_to_put_in = []
+        let indexes = []
+        corrected_errors.push(i)
+        for (let j = 0; j < errors.length; j++) {
+            if (j !== i && !corrected_errors.includes(j)) {
+              const word = errors[j][0];
+              const lower_bound = errors[j][2][0]
+              const upper_bound = errors[j][2][1]
+              str_to_put_in.push(`<span style="color: red">${word}</span>`);
+              indexes.push([lower_bound, upper_bound])
             }
-          }
-          for (let j = 0; j < errors.length; j++) {
-              if (j !== i && !corrected_errors.includes(j)) {
-                const errorIndex = errors[j][2];
-                words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
-              }
-            }
-          currentText.innerHTML = words.join(" ")
-          errorMessage.remove();
-          checkClearMessage();
+        }
+        const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes);
+        textWhenCorrection = sentence;
+        currentText.innerHTML = red_sentence
+        errorMessage.remove();
+        checkClearMessage();
         });
 
       const wrongWord = document.createElement("div");
       wrongWord.classList.add("wrongWord")
-      wrongWord.textContent = words[error[2]].replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '').replace(/<br>/g, "");
+      wrongWord.textContent = error[0];
       errorMessage.append(wrongWord)
 
       const arrow = document.createElement("div");
@@ -235,28 +270,35 @@ async function main(textWhenCorrection) {
 
       const correctWord = document.createElement("div");
       correctWord.classList.add("correctWord")
-      correctWord.textContent = error[1].replace(/<br>/g, "");
+      correctWord.textContent = error[1];
       errorMessage.append(correctWord)
 
       correctWord.addEventListener("click", function() {
-          const index = errors[i][2];
-          const words = splitWords(get_text())
-          if (!arraysEqual(textWhenCorrection, words)) {
-            correctText();
-            return;
-          }
-          words[index] = errors[i][1];
-          corrected_errors.push(i)
-          for (let j = 0; j < errors.length; j++) {
-              if (j !== i && !corrected_errors.includes(j)) {
-                const errorIndex = errors[j][2];
-                words[errorIndex] = `<span style="color: red">${words[errorIndex]}</span>`;
-              }
+        let sentence = splitWords(get_text())
+        if (!(textWhenCorrection === sentence)) {
+         correctText();
+          return;
+        }
+        let str_to_put_in = []
+        let indexes = []
+        corrected_errors.push(i)
+        const correction = correct_sentence(sentence, error[1], error[2][0], error[2][1], errors);
+        sentence = correction[0];
+        errors = correction[1];
+        for (let j = 0; j < errors.length; j++) {
+            if (j !== i && !corrected_errors.includes(j)) {
+              const word = errors[j][0];
+              const lower_bound = errors[j][2][0]
+              const upper_bound = errors[j][2][1]
+              str_to_put_in.push(`<span style="color: red">${word}</span>`);
+              indexes.push([lower_bound, upper_bound])
             }
-          textWhenCorrection = splitWords(words.join(" "));
-          currentText.innerHTML = words.join(" ");
-          errorMessage.remove();
-          checkClearMessage();
+        }
+        const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes);
+        textWhenCorrection = sentence;
+        currentText.innerHTML = red_sentence
+        errorMessage.remove();
+        checkClearMessage();
         });
 
       const errorElement = document.createElement("div");
