@@ -1,6 +1,6 @@
 
-//let service_url = "http://127.0.0.1:5000/";
-let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+let service_url = "http://127.0.0.1:5000/";
+//let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
@@ -56,7 +56,30 @@ function splitWords2(sentence) {
   return result; 
 }
 
+function set_margin() {
+  const leftColumn = document.querySelector('.text-and-recommendations .left-column');
+  const rightColumn = document.querySelector('.text-and-recommendations .right-column');
+  const windowHeight = window.innerHeight;
+  let totalHeight = 0
+  if (leftColumn.offsetHeight > rightColumn.offsetHeight) {
+    totalHeight += leftColumn.offsetHeight
+  } else {
+    totalHeight += rightColumn.offsetHeight
+  }
+  let margin = windowHeight - 400
+  if (totalHeight > 400) {
+    margin = totalHeight + (windowHeight - 750)
+  } 
+  if (margin < totalHeight) {
+    margin = totalHeight
+  }
+  document.querySelector('.text-and-recommendations').style.marginBottom = `${margin}px`;
+}
+
+set_margin()
+
 function get_text() {
+  set_margin()
   const text = document.querySelector(".text");
   const current_text = check_font();
   let html = current_text.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
@@ -89,6 +112,13 @@ function correct_sentence(sentence, string_to_put_in, start_index, end_index, er
   return [corrected_sentence, errors]
 }
 
+const divElement = document.querySelector('#text');
+const observer = new MutationObserver(() => {
+  // Call the set_margin() function whenever a change is detected
+  set_margin();
+});
+observer.observe(divElement, { childList: true, characterData: true, subtree: true });
+
 function make_sentence_red(sentence, string_to_put_in, indexes) {
   let result = "";
   let previousIndex = 0;
@@ -103,12 +133,27 @@ function make_sentence_red(sentence, string_to_put_in, indexes) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+  const feedbackButton = document.querySelector(".feedback-button");
+  feedbackButton.addEventListener("click", () => {
+    feedbackButton.innerText = "Sender..."
+    setTimeout(() => {
+      feedbackButton.innerText = "Mange tak for din feedback!";
+    }, 1000);
+    fetchFeedback();
+    const feedbackField = document.querySelector(".feedback-text");
+    feedbackField.innerText = ""
+    setTimeout(() => {
+      feedbackButton.innerText = "Indsend feedback";
+    }, 3000);
+  });
+
   var text = document.querySelector(".text");
   text.addEventListener("paste", function(e) {
     e.preventDefault();
     var current_text = e.clipboardData.getData("text/plain");
     var html = current_text.replace(/\n/g, "<br>");
     document.execCommand("insertHTML", false, html);
+    set_margin()
   });
 });
 
@@ -161,11 +206,23 @@ copyButton.addEventListener("click", () => {
   });
 });
 
+function fetchFeedback() {
+  const feedback = document.querySelector(".feedback-text").innerText;
+  let object = {"sentence": get_text(), "feedback": feedback};
+  fetch(service_url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(object)
+  });
+}
+
 async function fetchData() {
   if (splitWords(get_text()).length > 5000) {
     return "error"
   }
-  let object = {"sentence": get_text()};
+  let object = {"sentence": get_text(), "feedback": null};
   const response = await fetch(service_url, {
     method: 'POST',
     headers: {
@@ -174,7 +231,8 @@ async function fetchData() {
     body: JSON.stringify(object)
   });
   const data = await response.text();
-  errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));;
+  console.log(data, data.length)
+  errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
   return "success"
 }
 
@@ -256,6 +314,7 @@ async function main(textWhenCorrection) {
         currentText.innerHTML = red_sentence
         errorMessage.remove();
         checkClearMessage();
+        set_margin()
         });
 
       const wrongWord = document.createElement("div");
@@ -299,6 +358,7 @@ async function main(textWhenCorrection) {
         currentText.innerHTML = red_sentence
         errorMessage.remove();
         checkClearMessage();
+        set_margin()
         });
 
       const errorElement = document.createElement("div");
@@ -307,6 +367,8 @@ async function main(textWhenCorrection) {
       errorMessage.append(errorElement)
 
       rightColumn.appendChild(errorMessage)
+
+      set_margin()
   }
 
 correctTextButton.textContent = "Ret min tekst";

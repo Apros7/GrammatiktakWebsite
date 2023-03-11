@@ -134,13 +134,64 @@ body {
   font-size: 0.9em;
 }/*# sourceMappingURL=main.css.map */
 
-.footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
+.feedback {
   background-color: #007AF3;
   color: white;
+}
+
+.feedback .title {
   text-align: center;
+  font-size: 1.1em;
+  margin: 1em 1em 0em 1em;
+  padding: 1em;
+}
+
+.feedback .feedback-text{
+  text-align: left;
+  background: #f2f2f2;
+  color: #007AF3;
+  padding: 1em 1em;
+  margin: .2em 25em;
+  border-radius: 1em;
+}
+
+.feedback .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.feedback .button .feedback-button {
+  width: auto;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0 20px;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  border-radius: 1.5em;
+  background: #f2f2f2;
+  color: #007AF3;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+}
+
+.feedback .button .feedback-button:hover {
+  background-color: #555;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px;
+}
+
+.credits-page, .privacy-page {
+  width: auto;
+  color: #007AF3;
+  text-align: center;
+  cursor: pointer;
+  margin: 5px;
 }
