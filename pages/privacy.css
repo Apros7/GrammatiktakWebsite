@@ -1,0 +1,44 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap");
+body {
+  background: white;
+  margin: 0;
+  font-family: "Poppins";
+}
+
+.navbar {
+  background: white;
+  padding: 1em;
+  text-align: center;
+}
+.navbar .LogoText {
+  text-decoration: none;
+  color: black;
+  font-size: 1.6em;
+  font-weight: bold;
+}
+.navbar .LogoText span {
+  color: #007AF3;
+}
+
+.hero {
+  background: #007AF3;
+  text-align: center;
+  font-size: 1em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  line-height: 1.7em;
+  color: white;
+}
+
+.conditions {
+  background: white;
+  color: #007AF3;
+  margin-top: 1em;
+}
+
+.condition {
+  text-align: center;
+  margin-right: 10em;
+  margin-left: 10em;
+}
