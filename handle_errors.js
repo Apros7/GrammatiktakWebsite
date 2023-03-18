@@ -9,53 +9,6 @@ function splitWords(sentence) {
   return sentence
 }
 
-function splitWords2(sentence) {
-  sentence = sentence.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
-  let words = sentence.split(' '); 
-  let true_words = [];
-  let result = []; 
-  const symbols = ".,!?\";:"
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    if (symbols.includes(word[0]) || symbols.includes(word[-1])) {
-      if (i == 0) {
-        words[1] = word + " " + words[i]
-      } else {
-        const lastElement = true_words[true_words.length - 1]
-        let elements = [lastElement]
-        let pushWord = ""
-        if (symbols.includes(word[0])) {
-          elements.push(word[0]) 
-          pushWord = word.substring(1)
-        } else {
-          elements.push(word[-1])
-          pushWord = word.substring(0, word.length - 1)
-        }
-        true_words.splice(true_words.length - 1, 1, elements.join(" "))
-        true_words.push(pushWord)
-      }
-    } else {
-      true_words.push(word)
-    }
-  }
-  for (let i = 0; i < true_words.length; i++) {
-    const word = true_words[i];
-    if (word.includes('<br>')) { 
-      const [left, right] = word.split('<br>');
-      if (left === "" || right === "") {
-        result.push(word)
-      } else {
-        result.push(left + '<br>'); 
-        result.push(right); 
-      }
-    } else {
-      result.push(word); 
-    }
-  }
-  result = result.filter(str => str !== "");
-  return result; 
-}
-
 function set_margin() {
   const leftColumn = document.querySelector('.text-and-recommendations .left-column');
   const rightColumn = document.querySelector('.text-and-recommendations .right-column');
@@ -88,6 +41,8 @@ function get_text() {
   });
   html = html.replace(/<\/div>/g, '');
   html = html.replace(/&nbsp;/g, '');
+  html = html.replace("  ", " ")
+  console.log(html)
   return html;
 }
 
