@@ -65,7 +65,7 @@ body {
   padding: 10px;
 }
 
-.copy-button, .submit-button {
+.copy-button, .submit-button, .back-button, .clear-button {
   width: auto;
   padding: 0 20px;
   height: 50px;
@@ -78,7 +78,11 @@ body {
   margin: 5px;
 }
 
-.copy-button:hover, .submit-button:hover {
+.back-button {
+  display: none;
+}
+
+.copy-button:hover, .submit-button:hover, .back-button:hover, .clear-button:hover {
   background-color: #555;
 }
 
@@ -132,7 +136,20 @@ body {
 .text-and-recommendations .right-column .error-message .description {
   padding-top: 10px;
   font-size: 0.9em;
-}/*# sourceMappingURL=main.css.map */
+}
+
+.loading-screen {
+  padding: 1em 0em 1em 1em;
+  background: #f2f2f2;
+  border-radius: 1em;
+}
+
+.progress-bar {
+  width: 0;
+  height: 5px;
+  background-color: #007AF3;
+  border-radius: 2.5px;
+}
 
 .feedback {
   background-color: #007AF3;

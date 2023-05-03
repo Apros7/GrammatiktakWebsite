@@ -54,6 +54,10 @@ function check_font() {
 }
 
 function correct_sentence(sentence, string_to_put_in, start_index, end_index, errors) {
+  if (start_index === end_index) {
+    // no characters need to be added, return the original sentence and errors
+    return [sentence, errors];
+  }
   const corrected_sentence = sentence.slice(0, start_index) + string_to_put_in + sentence.slice(end_index)
   if (end_index !== start_index + string_to_put_in.length) {
     const difference = start_index + string_to_put_in.length - end_index
@@ -67,6 +71,7 @@ function correct_sentence(sentence, string_to_put_in, start_index, end_index, er
   return [corrected_sentence, errors]
 }
 
+
 const divElement = document.querySelector('#text');
 const observer = new MutationObserver(() => {
   // Call the set_margin() function whenever a change is detected
@@ -77,11 +82,15 @@ observer.observe(divElement, { childList: true, characterData: true, subtree: tr
 function make_sentence_red(sentence, string_to_put_in, indexes) {
   let result = "";
   let previousIndex = 0;
+  const markedIndexes = [];
   for (let i = 0; i < indexes.length; i++) {
     const [start, end] = indexes[i];
-    result += sentence.slice(previousIndex, start);
-    result += `<span style="color: red">${string_to_put_in[i]}</span>`;
-    previousIndex = end;
+    if (!markedIndexes.includes(start)) {
+      result += sentence.slice(previousIndex, start);
+      result += `<span style="color: red">${string_to_put_in[i]}</span>`;
+      previousIndex = end;
+      markedIndexes.push(start);
+    }
   }
   result += sentence.slice(previousIndex);
   return result;
@@ -114,6 +123,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
 const text = document.querySelector(".text")
 const placeholder = document.querySelector(".placeholder")
+
+// code for clear and back button:
+back_button = document.querySelector(".back-button");
+clear_button = document.querySelector(".clear-button");
+
+let previous_text = "";
+
+clear_button.addEventListener("click", () => {
+  previous_text = get_text();
+  back_button.style.display = "block";
+  text.innerHTML = "";
+})
+
+back_button.addEventListener("click", () => {
+  text.innerHTML = previous_text
+  previous_text = "";
+  back_button.style.display = "none";
+})
 
 text.addEventListener('input', () => {
   // If the editable div is empty, show the overlay element
@@ -191,13 +218,48 @@ async function fetchData() {
   return "success"
 }
 
+function simulateProgress(sentence) {
+  const loadingScreen = document.createElement("div");
+  loadingScreen.classList.add("loading-screen");
+  loadingScreen.id = "loading-screen"
+  const progressBar = document.createElement("div");
+  progressBar.classList.add("progress-bar");
+
+  const rightColumn = document.querySelector('.text-and-recommendations .right-column');
+
+  loadingScreen.appendChild(progressBar);
+  rightColumn.appendChild(loadingScreen);
+
+  const wordCount = sentence.split("").length;
+
+  let width = 0;
+
+  const interval = setInterval(() => {
+    if (width >= wordCount) {
+      clearInterval(interval);
+      // Hide the loading screen once progress is complete
+      document.getElementById("loading-screen").style.display = "none";
+    } else {
+      width++;
+      progressBar.style.width = `${width}%`;
+    }
+  }, 50);
+
+  return interval
+}
+
 async function main(textWhenCorrection) {
+
+  progressInterval = simulateProgress(textWhenCorrection);
 
   state = await fetchData();
   if (state === "error") {
     error_message = document.querySelector(".error-message")
     error_message.innerHTML = "Vi kan desværre ikke rette over 5000 tegn på nuværende tidspunkt. Vi beklager meget!"
   }
+
+  clearInterval(progressInterval)
+  document.getElementById("loading-screen").style.display = "none";
 
   let corrected_errors = []
 
