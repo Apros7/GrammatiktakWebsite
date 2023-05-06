@@ -42,7 +42,6 @@ function get_text() {
   html = html.replace(/<\/div>/g, '');
   html = html.replace(/&nbsp;/g, '');
   html = html.replace("  ", " ")
-  console.log(html)
   return html;
 }
 
@@ -213,7 +212,6 @@ async function fetchData() {
     body: JSON.stringify(object)
   });
   const data = await response.text();
-  console.log(data, data.length)
   errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
   return "success"
 }
