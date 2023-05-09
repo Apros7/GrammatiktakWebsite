@@ -229,11 +229,14 @@ function simulateProgress(sentence) {
   rightColumn.appendChild(loadingScreen);
 
   const wordCount = sentence.split("").length;
+  const intervalTime = (wordCount * 0.06);
+
+  console.log(wordCount, (wordCount * 0.05), intervalTime);
 
   let width = 0;
 
   const interval = setInterval(() => {
-    if (width >= wordCount) {
+    if (width >= 98) {
       clearInterval(interval);
       // Hide the loading screen once progress is complete
       document.getElementById("loading-screen").style.display = "none";
@@ -241,7 +244,7 @@ function simulateProgress(sentence) {
       width++;
       progressBar.style.width = `${width}%`;
     }
-  }, 50);
+  }, intervalTime);
 
   return interval
 }
