@@ -6,63 +6,45 @@
     <link rel="icon" type="image/x-icon" href="/images/BlueCheckmark.png">
     <title>GrammatikTAK!</title>
 </head>
-<body>
-    <div class="navbar">
-        <div class="LogoText">Grammatik<span>TAK!</span></div>
-    </div>
-    <section class="hero">
-        <div class="intro-text">Vi er stadig i beta, så nogle funktioner er ikke fuldt udviklet.</div>
-        <div class="intro-text">Hvis vi laver en fejl, så tryk på X. Vi bruger det til at blive bedre.</div>
-        <div class="intro-text">Er det rigtigt, så tryk på den blå boks. Så retter vi fejlen.</div>
-    </section>
-    <section class="text-and-recommendations">
-        <div class="left-column">
-            <div class="information-text">Her er din tekst</div> 
-            <div class="placeholder">Skriv eller kopier din tekst her...</div>
-            <div id="text" class="text" contenteditable="true" tabindex="1" autofocus="autofocus"></div>
-            <div class="text-buttons">
-                <div class="back-button">&#8592;</div>
-                <div class="clear-button">Slet</div>
-                <div class="copy-button">Kopier tekst</div>
-                <div class="submit-button">Ret min tekst</div>
+    <body>
+        <div class="navbar">
+            <div class="LogoText">Grammatik<span>TAK!</span></div>
+        </div>
+        <section class="hero">
+            <div class="intro-text">Vi er stadig i beta, så nogle funktioner er ikke fuldt udviklet.</div>
+            <div class="intro-text">Hvis vi laver en fejl, så tryk på X. Vi bruger det til at blive bedre.</div>
+            <div class="intro-text">Er det rigtigt, så tryk på den blå boks. Så retter vi fejlen.</div>
+        </section>
+        <section class="text-and-recommendations">
+            <div class="left-column">
+                <div class="information-text">Her er din tekst</div> 
+                <div class="placeholder">Skriv eller kopier din tekst her...</div>
+                <div id="text" class="text" contenteditable="true" tabindex="1" autofocus="autofocus"></div>
+                <div class="text-buttons">
+                    <div class="back-button">&#8592;</div>
+                    <div class="clear-button">Slet</div>
+                    <div class="copy-button">Kopier tekst</div>
+                    <div class="submit-button">Ret min tekst</div>
+                </div>
             </div>
-            <div class="error-message"></div>
-        </div>
-        <div class="right-column">
-            <div class="allClearText">Det ser ud til, at din tekst er fejlfri 😊.</div>
-        </div>
-        <script src="handle_errors.js"></script>
-    </section>
-    <section class="feedback">
-        <div class="padding"></div>
-        <div class="title">Hvad kan vi gøre bedre?</div>
-        <div id="feedback-text" class="feedback-text" contenteditable="true" tabindex="2" autofocus="autofocus"></div>
-        <div class="button">
-            <div class="feedback-button">Indsend feedback</div>
-        </div>
-    </section>
-    <section class="footer">
-        <div class="links">
-            <a href="pages/credits.html" class="credits-page">Credits</a>
-            <a href="pages/privacy.html" class="privacy-page">Privatlivspolitik</a>
-        </div>
-    </section>
-</body>
-
-<!-- Matomo -->
-<script>
-    var _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-      var u="https://grammatiktak.matomo.cloud/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '1']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.async=true; g.src='//cdn.matomo.cloud/grammatiktak.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
-    })();
-  </script>
-  <!-- End Matomo Code -->
-  
+            <div class="right-column">
+                <div class="allClearText">Det ser ud til, at din tekst er fejlfri 😊.</div>
+            </div>
+            <script src="handle_errors.js"></script>
+        </section>
+        <section class="feedback">
+            <div class="padding"></div>
+            <div class="title">Hvad kan vi gøre bedre?</div>
+            <div id="feedback-text" class="feedback-text" contenteditable="true" tabindex="2" autofocus="autofocus"></div>
+            <div class="button">
+                <div class="feedback-button">Indsend feedback</div>
+            </div>
+        </section>
+        <section class="footer">
+            <div class="links">
+                <a href="pages/credits.html" class="credits-page">Credits</a>
+                <a href="pages/privacy.html" class="privacy-page">Privatlivspolitik</a>
+            </div>
+        </section>
+    </body>
 </html>

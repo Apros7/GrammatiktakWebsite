@@ -1,6 +1,6 @@
 
-//let service_url = "http://127.0.0.1:5000/";
-let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+let service_url = "http://127.0.0.1:5000/";
+//let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
@@ -200,9 +200,6 @@ function fetchFeedback() {
 }
 
 async function fetchData() {
-  if (splitWords(get_text()).length > 5000) {
-    return "error"
-  }
   let object = {"sentence": get_text(), "feedback": null};
   const response = await fetch(service_url, {
     method: 'POST',
@@ -211,6 +208,9 @@ async function fetchData() {
     },
     body: JSON.stringify(object)
   });
+  if (!response.ok) {
+    return "error"
+  }
   const data = await response.text();
   errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
   return "success"
@@ -229,9 +229,7 @@ function simulateProgress(sentence) {
   rightColumn.appendChild(loadingScreen);
 
   const wordCount = sentence.split("").length;
-  const intervalTime = (wordCount * 0.06);
-
-  console.log(wordCount, (wordCount * 0.05), intervalTime);
+  const intervalTime = (wordCount * 0.15);
 
   let width = 0;
 
@@ -251,12 +249,31 @@ function simulateProgress(sentence) {
 
 async function main(textWhenCorrection) {
 
+  const rightColumn = document.querySelector(".right-column")
   progressInterval = simulateProgress(textWhenCorrection);
 
   state = await fetchData();
   if (state === "error") {
-    error_message = document.querySelector(".error-message")
-    error_message.innerHTML = "Vi kan desværre ikke rette over 5000 tegn på nuværende tidspunkt. Vi beklager meget!"
+    clearInterval(progressInterval)
+    document.getElementById("loading-screen").style.display = "none";
+    errorText = document.createElement("div")
+    errorText.classList.add("errorText")
+    errorText.textContent = "Der er desværre sket en fejl på vores side. \nVi er opmærksomme på fejlen og retter den hurtigst muligt!"
+    rightColumn.appendChild(errorText)
+    correctTextButton.textContent = "Ret min tekst";
+
+    // send auto feedback
+    const feedback = "Automatic Feedback: Text Failed"
+    let object = {"sentence": get_text(), "feedback": feedback};
+    fetch(service_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(object)
+    });
+
+    return 
   }
 
   clearInterval(progressInterval)
@@ -279,8 +296,6 @@ async function main(textWhenCorrection) {
   sentence = make_sentence_red(sentence, str_to_put_in, indexes);
   const currentText = document.querySelector(".text")
   currentText.innerHTML = sentence
-
-  const rightColumn = document.querySelector(".right-column")
 
   function checkClearMessage() {
       if (rightColumn.childElementCount === 0) {

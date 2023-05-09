@@ -103,6 +103,14 @@ body {
   background: #f2f2f2;
   border-radius: 1em;
 }
+
+.text-and-recommendations .right-column .errorText {
+  padding: 1em 0em 1em 1em;
+  background: #f2f2f2;
+  border-radius: 1em;
+  border: 5px solid red;
+}
+
 .text-and-recommendations .right-column .error-message {
   margin-top: 0;
   margin-bottom: 1em;
