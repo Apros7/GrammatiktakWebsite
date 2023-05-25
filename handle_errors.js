@@ -57,6 +57,16 @@ function correct_sentence(sentence, string_to_put_in, start_index, end_index, er
     // no characters need to be added, return the original sentence and errors
     return [sentence, errors];
   }
+  const emojiIndexes = findEmojiIndexes(sentence);
+  for (const j in emojiIndexes) {
+    const value = emojiIndexes[j]
+    if (value < start_index) {
+      start_index += 1; end_index += 1;
+    }
+    else if (value < end_index) {
+      end_index += 1
+    }
+  }
   const corrected_sentence = sentence.slice(0, start_index) + string_to_put_in + sentence.slice(end_index)
   if (end_index !== start_index + string_to_put_in.length) {
     const difference = start_index + string_to_put_in.length - end_index
@@ -70,6 +80,18 @@ function correct_sentence(sentence, string_to_put_in, start_index, end_index, er
   return [corrected_sentence, errors]
 }
 
+function findEmojiIndexes(str) {
+  const emojiRegex = /\p{Emoji}/gu; // Unicode property escapes for emoji matching
+
+  const emojiIndexes = [];
+  let match;
+  while ((match = emojiRegex.exec(str)) !== null) {
+    emojiIndexes.push(match.index);
+  }
+
+  return emojiIndexes;
+}
+
 
 const divElement = document.querySelector('#text');
 const observer = new MutationObserver(() => {
@@ -79,14 +101,26 @@ const observer = new MutationObserver(() => {
 observer.observe(divElement, { childList: true, characterData: true, subtree: true });
 
 function make_sentence_red(sentence, string_to_put_in, indexes) {
+  const emojiIndexes = findEmojiIndexes(sentence);
   let result = "";
   let previousIndex = 0;
   const markedIndexes = [];
   for (let i = 0; i < indexes.length; i++) {
-    const [start, end] = indexes[i];
+    let [start, end] = indexes[i];
+    for (const j in emojiIndexes) {
+      const value = emojiIndexes[j]
+      if (value < start) {
+        start += 1
+        end += 1
+      }
+      else if (value > start && value < end) {
+        end += 1
+      }
+    }
+
     if (!markedIndexes.includes(start)) {
       result += sentence.slice(previousIndex, start);
-      result += `<span style="color: red">${string_to_put_in[i]}</span>`;
+      result += string_to_put_in[i];
       previousIndex = end;
       markedIndexes.push(start);
     }
