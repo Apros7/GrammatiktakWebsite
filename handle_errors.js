@@ -263,7 +263,7 @@ function simulateProgress(sentence) {
   rightColumn.appendChild(loadingScreen);
 
   const wordCount = sentence.split("").length;
-  const intervalTime = (wordCount * 0.15);
+  const intervalTime = (wordCount * 0.30);
 
   let width = 0;
 
