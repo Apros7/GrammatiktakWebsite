@@ -329,7 +329,7 @@ async function main(textWhenCorrection) {
 
   sentence = make_sentence_red(sentence, str_to_put_in, indexes);
   const currentText = document.querySelector(".text")
-  currentText.innerHTML = sentence
+  currentText.setHTML(sentence)
 
   function checkClearMessage() {
       if (rightColumn.childElementCount === 0) {
