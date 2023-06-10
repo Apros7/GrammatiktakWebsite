@@ -1,5 +1,5 @@
 
-//let service_url = "http://127.0.0.1:5000/";
+// let service_url = "http://127.0.0.1:5000/";
 let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
@@ -323,7 +323,7 @@ async function main(textWhenCorrection) {
       const word = errors[i][0];
       const lower_bound = errors[i][2][0]
       const upper_bound = errors[i][2][1]
-      str_to_put_in.push(`<span style="color: red">${word}</span>`);
+      str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
       indexes.push([lower_bound, upper_bound])
   }
 
@@ -372,7 +372,7 @@ async function main(textWhenCorrection) {
               const word = errors[j][0];
               const lower_bound = errors[j][2][0]
               const upper_bound = errors[j][2][1]
-              str_to_put_in.push(`<span style="color: red">${word}</span>`);
+              str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
               indexes.push([lower_bound, upper_bound])
             }
         }
@@ -416,7 +416,7 @@ async function main(textWhenCorrection) {
               const word = errors[j][0];
               const lower_bound = errors[j][2][0]
               const upper_bound = errors[j][2][1]
-              str_to_put_in.push(`<span style="color: red">${word}</span>`);
+              str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
               indexes.push([lower_bound, upper_bound])
             }
         }
