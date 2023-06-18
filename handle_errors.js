@@ -41,7 +41,7 @@ function get_text() {
   });
   html = html.replace(/<\/div>/g, '');
   html = html.replace(/&nbsp;/g, '');
-  html = html.replace("  ", " ")
+  html = html.replace("  ", " ") // should be deleted with new backend update
   return html;
 }
 
