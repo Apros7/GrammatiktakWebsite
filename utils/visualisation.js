@@ -53,7 +53,7 @@ class VisualError {
         closeButton.textContent = "X";
         closeButton.addEventListener("click", function() {
             if (!(this.sentence_information.text_at_correct_time === this.sentence_information.current_text)) {
-                return "correct" // Correction is needed again as corrected text and current sentence does not match
+                return "correct", null // Correction is needed again as corrected text and current sentence does not match
             }
             let str_to_put_in = []
             let indexes = []
@@ -68,11 +68,17 @@ class VisualError {
                 }
             }
             const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes);
-            textWhenCorrection = sentence;
-            currentText.innerHTML = red_sentence
-            errorMessage.remove();
-            checkClearMessage();
-            set_margin()
+            this.visual_representation.remove();
+            return sentence, red_sentence
             });
     }
 }
+
+// Logs of what needs to be done:
+
+// // After 
+// textWhenCorrection = sentence;
+// currentText.innerHTML = red_sentence
+// errorMessage.remove();
+// checkClearMessage();
+// set_margin()
