@@ -67,7 +67,7 @@ copyButton.addEventListener("click", () => {
   });
 
 correctTextButton.addEventListener("click", () => {
-    correctText();
+    correct_text();
   })
 
 // code for clear and back button:
@@ -99,7 +99,7 @@ text.addEventListener('input', () => {
     }
 });
 
-function correctText() {
+function correct_text() {
     let text_at_correction_time = get_text();
     rightColumn.innerHTML = "";
     correctTextButton.textContent = "Retter din tekst...";
