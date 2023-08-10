@@ -1,5 +1,5 @@
 import { set_margin } from "page_control.js";
-import { check_clear_message} from "visualisation_other.js"
+import { check_clear_message } from "visualisation_other.js"
 import { correct_text } from "../handle_errors2.js"
 
 function make_sentence_red(sentence, string_to_put_in, indexes) {
@@ -31,7 +31,7 @@ function make_sentence_red(sentence, string_to_put_in, indexes) {
   }
 
 // Sentence information is an object as it allows for change without reinitilizing
-// Has to include text_at_correction_time and current_text
+// Has to include text_at_correction_time, current_text, corrected_errors
 
 class VisualError {
   constructor(error, sentence_information) {
@@ -45,10 +45,14 @@ class VisualError {
   }
 
   init_visual_representation() {
-    this.visual_representation.append(this.close_button())
+    this.visual_representation.append(this.create_close_button())
+    this.visual_representation.append(this.create_wrong_word())
+    this.visual_representation.append(this.create_arrow())
+    this.visual_representation.append(this.create_right_word())
+    this.visual_representation.append(this.create_description())
   }
 
-  close_button() {
+  create_close_button() {
     // Still needs testing
     const closeButton = document.createElement("div");
     closeButton.classList.add("close-button");
@@ -60,9 +64,9 @@ class VisualError {
       }
       let str_to_put_in = []
       let indexes = []
-      corrected_errors.push(i)
+      this.sentence_information.corrected_errors.push(i)
       for (let j = 0; j < errors.length; j++) {
-          if (j !== i && !corrected_errors.includes(j)) {
+          if (j !== i && !this.sentence_information.corrected_errors.includes(j)) {
             const word = errors[j][0];
             const lower_bound = errors[j][2][0]
             const upper_bound = errors[j][2][1]
@@ -74,10 +78,38 @@ class VisualError {
       this.visual_representation.remove();
       this.sentence_information.text_at_correct_time = sentence;
       const currentText = document.querySelector(".text")
-      currentText.setHTML(sentence)
+      currentText.setHTML(red_sentence)
       check_clear_message()
       set_margin()
-      return sentence, red_sentence
     });
+    return closeButton
+  }
+
+  create_wrong_word() {
+    const wrongWord = document.createElement("div");
+    wrongWord.classList.add("wrongWord")
+    wrongWord.textContent = error[0];
+    return wrongWord
+  }
+
+  create_arrow() {
+    const arrow = document.createElement("div");
+    arrow.classList.add("arrow")
+    arrow.innerHTML = "&#8594;"
+    return arrow
+  }
+
+  create_right_word() {
+    const correctWord = document.createElement("div");
+    correctWord.classList.add("correctWord")
+    correctWord.textContent = error[1];
+    return correctWord
+  }
+
+  create_description() {
+    const description = document.createElement("div");
+    description.classList.add("description");
+    description.textContent = error[3]
+    return description
   }
 }

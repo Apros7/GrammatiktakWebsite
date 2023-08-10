@@ -310,7 +310,6 @@ async function main(textWhenCorrection) {
     return 
   }
 
-  // nået hertil i refactoring
 
   clearInterval(progressInterval)
   document.getElementById("loading-screen").style.display = "none";
@@ -321,94 +320,98 @@ async function main(textWhenCorrection) {
   let str_to_put_in = []
   let indexes = []
 
+  
   for (let i = 0; i < errors.length; i++) {
-      const word = errors[i][0];
-      const lower_bound = errors[i][2][0]
-      const upper_bound = errors[i][2][1]
-      str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
-      indexes.push([lower_bound, upper_bound])
+    const word = errors[i][0];
+    const lower_bound = errors[i][2][0]
+    const upper_bound = errors[i][2][1]
+    str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
+    indexes.push([lower_bound, upper_bound])
   }
-
+  
   sentence = make_sentence_red(sentence, str_to_put_in, indexes);
   const currentText = document.querySelector(".text")
   currentText.setHTML(sentence)
-
+  
   function checkClearMessage() {
-      if (rightColumn.childElementCount === 0) {
-          allClearText = document.createElement("div")
-          allClearText.classList.add("allClearText")
-          allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
-          rightColumn.appendChild(allClearText)
-        }
-  }
-
-  if (errors.length === 0) {
+    if (rightColumn.childElementCount === 0) {
       allClearText = document.createElement("div")
       allClearText.classList.add("allClearText")
       allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
       rightColumn.appendChild(allClearText)
+    }
   }
-
+  
+  if (errors.length === 0) {
+    allClearText = document.createElement("div")
+    allClearText.classList.add("allClearText")
+    allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
+    rightColumn.appendChild(allClearText)
+  }
+  
   for (let i = 0; i < errors.length; i++) {
-      const error = errors[i];
-      
-      const errorMessage = document.createElement("div");
-      errorMessage.classList.add("error-message");
-
-      const closeButton = document.createElement("div");
-      closeButton.classList.add("close-button");
-      closeButton.textContent = "X";
-      errorMessage.append(closeButton)
-
-      closeButton.addEventListener("click", function() {
-        const sentence = splitWords(get_text())
-        if (!(textWhenCorrection === sentence)) {
-          correctText();
-          return;
+    const error = errors[i];
+    
+    const errorMessage = document.createElement("div");
+    errorMessage.classList.add("error-message");
+    
+    const closeButton = document.createElement("div");
+    closeButton.classList.add("close-button");
+    closeButton.textContent = "X";
+    errorMessage.append(closeButton)
+    
+    closeButton.addEventListener("click", function() {
+      const sentence = splitWords(get_text())
+      if (!(textWhenCorrection === sentence)) {
+        correctText();
+        return;
+      }
+      let str_to_put_in = []
+      let indexes = []
+      corrected_errors.push(i)
+      for (let j = 0; j < errors.length; j++) {
+        if (j !== i && !corrected_errors.includes(j)) {
+          const word = errors[j][0];
+          const lower_bound = errors[j][2][0]
+          const upper_bound = errors[j][2][1]
+          str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
+          indexes.push([lower_bound, upper_bound])
         }
-        let str_to_put_in = []
-        let indexes = []
-        corrected_errors.push(i)
-        for (let j = 0; j < errors.length; j++) {
-            if (j !== i && !corrected_errors.includes(j)) {
-              const word = errors[j][0];
-              const lower_bound = errors[j][2][0]
-              const upper_bound = errors[j][2][1]
-              str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
-              indexes.push([lower_bound, upper_bound])
-            }
-        }
-        const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes);
-        textWhenCorrection = sentence;
-        currentText.innerHTML = red_sentence
-        errorMessage.remove();
-        checkClearMessage();
-        set_margin()
-        });
+      }
+      const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes);
+      textWhenCorrection = sentence;
+      currentText.innerHTML = red_sentence
+      errorMessage.remove();
+      checkClearMessage();
+      set_margin()
+    });
+    
+    const wrongWord = document.createElement("div");
+    wrongWord.classList.add("wrongWord")
+    wrongWord.textContent = error[0];
+    errorMessage.append(wrongWord)
+    
+    const arrow = document.createElement("div");
+    arrow.classList.add("arrow")
+    arrow.innerHTML = "&#8594;"
+    errorMessage.append(arrow)
+    
+    const correctWord = document.createElement("div");
+    correctWord.classList.add("correctWord")
+    correctWord.textContent = error[1];
+    errorMessage.append(correctWord)
 
-      const wrongWord = document.createElement("div");
-      wrongWord.classList.add("wrongWord")
-      wrongWord.textContent = error[0];
-      errorMessage.append(wrongWord)
-
-      const arrow = document.createElement("div");
-      arrow.classList.add("arrow")
-      arrow.innerHTML = "&#8594;"
-      errorMessage.append(arrow)
-
-      const correctWord = document.createElement("div");
-      correctWord.classList.add("correctWord")
-      correctWord.textContent = error[1];
-      errorMessage.append(correctWord)
-
-      correctWord.addEventListener("click", function() {
-        let sentence = splitWords(get_text())
-        if (!(textWhenCorrection === sentence)) {
-         correctText();
-          return;
-        }
-        let str_to_put_in = []
-        let indexes = []
+    // nået hertil i refactoring
+    // det eneste der mangler er denne function med correctWord ved klick
+    
+    correctWord.addEventListener("click", function() {
+      let sentence = splitWords(get_text())
+      if (!(textWhenCorrection === sentence)) {
+        correctText();
+        return;
+      }
+      let str_to_put_in = []
+      let indexes = []
         corrected_errors.push(i)
         const correction = correct_sentence(sentence, error[1], error[2][0], error[2][1], errors);
         sentence = correction[0];

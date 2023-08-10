@@ -30,6 +30,7 @@ function simulateProgress(sentence) {
 }
 
 function check_clear_message() {
+  const rightColumn = document.querySelector('.text-and-recommendations .right-column');
   if (rightColumn.childElementCount === 0) {
     allClearText = document.createElement("div")
     allClearText.classList.add("allClearText")

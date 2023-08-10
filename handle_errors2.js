@@ -3,6 +3,8 @@ import { set_margin } from "utils/page_control.js";
 import { get_text } from "utils/retrieve_text.js";
 import { correct_sentence } from "utils/correct_text.js";
 import { fetchData, fetchFeedback, handle_fetching_error } from "utils/fetching.js"
+import { make_sentence_red, VisualError } from "utils/visualisation_errors.js";
+import { check_clear_message, simulateProgress} from "utils/visualisation_other.js"
 
 // let service_url = "http://127.0.0.1:5000/";
 let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
@@ -11,7 +13,8 @@ let errors = []
 let originalText = "dette er din tekst"
 let sentence_information = {
     text_at_correction_time: "",
-    current_text: ""
+    current_text: "",
+    corrected_errors: []
 }
 
 set_margin()
@@ -99,6 +102,19 @@ text.addEventListener('input', () => {
     }
 });
 
+function init_make_sentence_red(sentence, errors) {
+    let str_to_put_in = []
+    let indexes = []
+    for (let i = 0; i < errors.length; i++) {
+        const word = errors[i][0];
+        const lower_bound = errors[i][2][0]
+        const upper_bound = errors[i][2][1]
+        str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
+        indexes.push([lower_bound, upper_bound])
+    }
+    return make_sentence_red(sentence, str_to_put_in, indexes)
+}
+
 function correct_text() {
     let text_at_correction_time = get_text();
     rightColumn.innerHTML = "";
@@ -107,19 +123,23 @@ function correct_text() {
 }
 
 async function main(text_at_correction_time) {
-    progress_interval = simulateProgress(text_at_correction_time);
-    errors = await fetchData()
-    clearInterval(progress_interval)
-    document.getElementById("loading-screen").style.display = "none";
-    handle_fetching_error(errors)
+  sentence_information.corrected_errors = []
+  progress_interval = simulateProgress(text_at_correction_time);
+  sentence_information.text_at_correction_time = get_text()
+  errors = await fetchData(service_url)
+  clearInterval(progress_interval)
+  document.getElementById("loading-screen").style.display = "none";
+  handle_fetching_error(errors)
 
-    let corrected_errors = []
-    let sentence = get_text()
-    let str_to_put_in = []
-    let indexes = []
-    
+  let sentence = get_text()
+  text.setHTML(init_make_sentence_red(sentence, errors))
 
-    return null;
+  // Make errors //
+  for (let i = 0; i < errors.length; i++) {
+      rightColumn.append(new VisualError(errors[i], sentence_information))
+  }
+  
+  check_clear_message()
 }
 
 // One error could be from RightColumn being declared outside of functions instead of in each one
