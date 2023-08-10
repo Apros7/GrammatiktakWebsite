@@ -2,12 +2,17 @@
 import { set_margin } from "utils/page_control.js";
 import { get_text } from "utils/retrieve_text.js";
 import { correct_sentence } from "utils/correct_text.js";
+import { fetchData, fetchFeedback, handle_fetching_error } from "utils/fetching.js"
 
 // let service_url = "http://127.0.0.1:5000/";
 let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
+let sentence_information = {
+    text_at_correction_time: "",
+    current_text: ""
+}
 
 set_margin()
 
@@ -48,6 +53,7 @@ const text = document.querySelector(".text")
 const placeholder = document.querySelector(".placeholder")
 const correctTextButton = document.querySelector(".submit-button")
 const copyButton = document.querySelector(".copy-button");
+const rightColumn = document.querySelector(".right-column");
 
 copyButton.addEventListener("click", () => {
     navigator.clipboard.writeText(document.querySelector(".text").innerText).then(() => {
@@ -61,7 +67,7 @@ copyButton.addEventListener("click", () => {
   });
 
 correctTextButton.addEventListener("click", () => {
-    correctText(); // MANGLER
+    correctText();
   })
 
 // code for clear and back button:
@@ -92,3 +98,28 @@ text.addEventListener('input', () => {
       text.style.marginTop = "0";
     }
 });
+
+function correctText() {
+    let text_at_correction_time = get_text();
+    rightColumn.innerHTML = "";
+    correctTextButton.textContent = "Retter din tekst...";
+    main(text_at_correction_time);
+}
+
+async function main(text_at_correction_time) {
+    progress_interval = simulateProgress(text_at_correction_time);
+    errors = await fetchData()
+    clearInterval(progress_interval)
+    document.getElementById("loading-screen").style.display = "none";
+    handle_fetching_error(errors)
+
+    let corrected_errors = []
+    let sentence = get_text()
+    let str_to_put_in = []
+    let indexes = []
+    
+
+    return null;
+}
+
+// One error could be from RightColumn being declared outside of functions instead of in each one

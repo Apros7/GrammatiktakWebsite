@@ -188,7 +188,6 @@ text.addEventListener('input', () => {
 
 const correctTextButton = document.querySelector(".submit-button")
 
-// MANGLER
 function correctText() {
   const rightColumn = document.querySelector(".right-column");
   let textWhenCorrection = splitWords(get_text())
@@ -196,7 +195,6 @@ function correctText() {
   correctTextButton.textContent = "Retter din tekst...";
   main(textWhenCorrection);
 }
-//
 
 function arraysEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -311,6 +309,8 @@ async function main(textWhenCorrection) {
 
     return 
   }
+
+  // nået hertil i refactoring
 
   clearInterval(progressInterval)
   document.getElementById("loading-screen").style.display = "none";
