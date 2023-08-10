@@ -16,7 +16,6 @@ function make_sentence_red(sentence, string_to_put_in, indexes) {
           end += 1
         }
       }
-  
       if (!markedIndexes.includes(start)) {
         result += sentence.slice(previousIndex, start);
         result += string_to_put_in[i];
@@ -79,6 +78,5 @@ class VisualError {
 // // After 
 // textWhenCorrection = sentence;
 // currentText.innerHTML = red_sentence
-// errorMessage.remove();
 // checkClearMessage();
 // set_margin()
