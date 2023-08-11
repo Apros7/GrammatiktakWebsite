@@ -1,6 +1,6 @@
-import { get_text } from "retrieve_text.js";
+import { get_text } from "./retrieve_text.js";
 
-function fetchFeedback(service_url, feedback = null) {
+export function fetchFeedback(service_url, feedback = null) {
     if (feedback === null) {feedback = document.querySelector(".feedback-text").innerText;}
     let object = {"sentence": get_text(), "feedback": feedback};
     fetch(service_url, {
@@ -12,7 +12,7 @@ function fetchFeedback(service_url, feedback = null) {
     });
 }
 
-async function fetchData(service_url) {
+export async function fetchData(service_url) {
     let object = {"sentence": get_text(), "feedback": null};
     const response = await fetch(service_url, {
       method: 'POST',
@@ -25,7 +25,7 @@ async function fetchData(service_url) {
       return "error"
     }
     const data = await response.text();
-    errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
+    const errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
     return errors
 }
 
@@ -38,11 +38,11 @@ function create_fetching_error_message() {
     rightColumn.appendChild(errorText)
 }
 
-function handle_fetching_error(status, service_url) {
-    if (status !== "error") {return status}
-    create_fetching_error_message()
-    const correctTextButton = document.querySelector(".submit-button")
-    correctTextButton.textContent = "Ret min tekst";
-    // sent auto feedback in case of error
-    fetchFeedback(service_url, feedback="Automatic Feedback: Text Failed")
+export function handle_fetching_error(status, service_url) {
+  const correctTextButton = document.querySelector(".submit-button")
+  correctTextButton.innerText = "Ret min tekst";
+  if (status !== "error") {return status}
+  create_fetching_error_message()
+  // sent auto feedback in case of error
+  fetchFeedback(service_url, feedback="Automatic Feedback: Text Failed")
 }

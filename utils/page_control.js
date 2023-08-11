@@ -1,6 +1,6 @@
 
 
-function set_margin() {
+export function set_margin() {
   const leftColumn = document.querySelector('.text-and-recommendations .left-column');
   const rightColumn = document.querySelector('.text-and-recommendations .right-column');
   const windowHeight = window.innerHeight;

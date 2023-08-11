@@ -1,5 +1,5 @@
 
-function correct_sentence(sentence, string_to_put_in, start_index, end_index, errors) {
+export function correct_sentence(sentence, string_to_put_in, start_index, end_index, errors) {
   if (start_index === end_index) {
     // no characters need to be added, return the original sentence and errors
     return [sentence, errors];
@@ -27,7 +27,7 @@ function correct_sentence(sentence, string_to_put_in, start_index, end_index, er
   return [corrected_sentence, errors]
 }
 
-function findEmojiIndexes(str) {
+export function findEmojiIndexes(str) {
   const emojiRegex = /\p{Emoji}/gu; // Unicode property escapes for emoji matching
 
   const emojiIndexes = [];

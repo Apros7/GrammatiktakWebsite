@@ -1,6 +1,6 @@
-import { set_margin } from "page_control.js";
+import { set_margin } from "./page_control.js";
 
-function get_text() {
+export function get_text() {
     set_margin()
     const text = document.querySelector(".text");
     const current_text = check_font();

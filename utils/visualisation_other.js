@@ -1,5 +1,5 @@
 
-function simulateProgress(sentence) {
+export function simulateProgress(sentence) {
   const loadingScreen = document.createElement("div");
   loadingScreen.classList.add("loading-screen");
   loadingScreen.id = "loading-screen"
@@ -29,7 +29,7 @@ function simulateProgress(sentence) {
   return interval
 }
 
-function check_clear_message() {
+export function check_clear_message() {
   const rightColumn = document.querySelector('.text-and-recommendations .right-column');
   if (rightColumn.childElementCount === 0) {
     allClearText = document.createElement("div")
