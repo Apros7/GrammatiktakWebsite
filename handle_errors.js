@@ -142,5 +142,3 @@ async function main(text_at_correction_time) {
   
   check_clear_message()
 }
-
-// One error could be from RightColumn being declared outside of functions instead of in each one
