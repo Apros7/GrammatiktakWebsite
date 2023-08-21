@@ -32,7 +32,7 @@ export function simulateProgress(sentence) {
 export function check_clear_message() {
   const rightColumn = document.querySelector('.text-and-recommendations .right-column');
   if (rightColumn.childElementCount === 0) {
-    allClearText = document.createElement("div")
+    let allClearText = document.createElement("div")
     allClearText.classList.add("allClearText")
     allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
     rightColumn.appendChild(allClearText)

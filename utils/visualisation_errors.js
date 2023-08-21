@@ -58,7 +58,6 @@ export class VisualError {
   }
 
   create_close_button() {
-    // Still needs testing
     const closeButton = document.createElement("div");
     closeButton.classList.add("close-button");
     closeButton.textContent = "X";
