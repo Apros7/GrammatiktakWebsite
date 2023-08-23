@@ -1,9 +1,10 @@
 import { set_margin } from "../utils/page_control.js";
 import { check_clear_message } from "./visualisation_other.js"
-import { correct_text } from "../handle_errors.js"
+import { auto_check_text } from "../handle_errors.js"
 import { findEmojiIndexes } from "./correct_text.js"
 import { get_text } from "./retrieve_text.js";
 import { correct_sentence } from "./correct_text.js";
+import { create_id_from_raw_error, unnestErrors } from "./helper_functions.js"
 
 export function make_sentence_red(sentence, string_to_put_in, indexes) {
     const emojiIndexes = findEmojiIndexes(sentence);
@@ -33,6 +34,15 @@ export function make_sentence_red(sentence, string_to_put_in, indexes) {
     return result;
   }
 
+function create_id(VisualErrorInstance) {
+  return VisualErrorInstance.indexes[0] + VisualErrorInstance.wrong_word + VisualErrorInstance.indexes[1]
+}
+
+export function should_visualize_id(VisualErrorInstance) {
+  if (VisualErrorInstance.sentence_information.removed_error_ids.includes(VisualErrorInstance.id)) {return false}
+  return true
+}
+
 // Sentence information is an object as it allows for change without reinitilizing
 // Has to include text_at_correction_time, current_text, corrected_errors
 
@@ -42,8 +52,10 @@ export class VisualError {
     this.right_word = error[1]
     this.indexes = error[2]
     this.description = error[3]
+    this.chunk_number = error[4]
     this.sentence_information = sentence_information
     this.error_index = error_index
+    this.id = create_id(this)
     this.visual_representation = document.createElement("div")
     this.visual_representation.classList.add("error-message")
     this.init_visual_representation()
@@ -61,30 +73,33 @@ export class VisualError {
     const closeButton = document.createElement("div");
     closeButton.classList.add("close-button");
     closeButton.textContent = "X";
-    closeButton.addEventListener("click", () => {
+    closeButton.addEventListener("click", async () => {
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
-        correct_text()
+        this.visual_representation.remove()
+        // correct_text()
         return;
       }
       let str_to_put_in = []
       let indexes = []
       this.sentence_information.corrected_errors.push(this.error_index)
-      for (let j = 0; j < this.sentence_information.errors.length; j++) {
+      let errors = await unnestErrors(this.sentence_information)
+      //sentence_information.errors findes ikke
+      for (let j = 0; j < errors.length; j++) {
           if (j !== this.error_index && !this.sentence_information.corrected_errors.includes(j)) {
-            const word = this.sentence_information.errors[j][0];
-            const lower_bound = this.sentence_information.errors[j][2][0]
-            const upper_bound = this.sentence_information.errors[j][2][1]
-            str_to_put_in.push(`<span style="color: red">${this.sentence_information.current_text.slice(lower_bound, upper_bound)}</span>`);
+            const lower_bound = errors[j][2][0]
+            const upper_bound = errors[j][2][1]
+            str_to_put_in.push(`<span class="highlightedWord">${this.sentence_information.current_text.slice(lower_bound, upper_bound)}</span>`);
             indexes.push([lower_bound, upper_bound])
           }
       }
       const red_sentence = make_sentence_red(this.sentence_information.current_text, str_to_put_in, indexes);
-      this.visual_representation.remove();
+      this.visual_representation.remove()
+      this.sentence_information.removed_error_ids.push(this.id)
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
-      const currentText = document.querySelector(".text")
-      currentText.setHTML(red_sentence)
-      check_clear_message()
+      const textUnderline = document.getElementById("text-underline")
+      textUnderline.setHTML(red_sentence)
+      check_clear_message(this.sentence_information)
       set_margin()
     });
     return closeButton
@@ -108,33 +123,62 @@ export class VisualError {
     const correctWord = document.createElement("div");
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
-    correctWord.addEventListener("click", () => {
+    correctWord.addEventListener("click", async () => {
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
-        correct_text()
+        console.log(this.sentence_information.text_at_correction_time)
+        console.log(this.sentence_information.current_text)
+        this.visual_representation.remove()
+        // correct_text()
         return;
       }
       let str_to_put_in = []
       let indexes = []
-      this.sentence_information.corrected_errors.push(this.error_index)
-      const correction = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0], this.indexes[1], this.sentence_information.errors);
-      this.sentence_information.current_text = correction[0];
-      this.sentence_information.errors = correction[1];
-      for (let j = 0; j < this.sentence_information.errors.length; j++) {
-          if (j !== this.error_index && !this.sentence_information.corrected_errors.includes(j)) {
-            const word = this.sentence_information.errors[j][0];
-            const lower_bound = this.sentence_information.errors[j][2][0]
-            const upper_bound = this.sentence_information.errors[j][2][1]
-            str_to_put_in.push(`<span style="color: red">${this.sentence_information.current_text.slice(lower_bound, upper_bound)}</span>`);
-            indexes.push([lower_bound, upper_bound])
-          }
+      let chunks = get_text().split("<br>")
+      let number_to_add = (this.chunk_number) * '<br>'.length
+      for (let j = 0; j < chunks.length; j++) {
+        if (j < this.chunk_number) { number_to_add += chunks[j].length }
       }
-      const red_sentence = make_sentence_red(this.sentence_information.current_text, str_to_put_in, indexes);
+      this.sentence_information.corrected_errors.push(this.id)
+      let errors = await unnestErrors(this.sentence_information)
+      const correction = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0] 
+                                          + number_to_add, this.indexes[1] + number_to_add, errors, this.chunk_number);
+      this.sentence_information.current_text = correction[0];
+      chunks = correction[0].split("<br>")
+      // for (let j = 0; j < errors.length; j++) {
+      //   const error_id = create_id_from_raw_error(errors[j])
+      //   console.log(error_id, this.id)
+      //     if (error_id !== this.id) {
+      //       const chunk_number = errors[j][4]
+      //       let number_to_add = (chunk_number) * '<br>'.length
+      //       for (let j = 0; j < chunks.length; j++) {
+      //         if (j < chunk_number) { number_to_add += chunks[j].length }
+      //       }
+      //       console.log(error_id)
+      //       const lower_bound = errors[j][2][0] + number_to_add
+      //       const upper_bound = errors[j][2][1] + number_to_add
+      //       console.log("sentence_information_slice: ", this.sentence_information.current_text, this.sentence_information.current_text.slice(lower_bound, upper_bound))
+      //       str_to_put_in.push(`<span class="highlightedWord">${this.sentence_information.current_text.slice(lower_bound, upper_bound)}</span>`);
+      //       indexes.push([lower_bound, upper_bound])
+      //     }
+      // }
+      // console.log(str_to_put_in)
+      // const red_sentence = make_sentence_red(this.sentence_information.current_text, str_to_put_in, indexes);
       this.visual_representation.remove();
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
-      const currentText = document.querySelector(".text")
-      currentText.setHTML(red_sentence)
-      check_clear_message()
+      const text = document.getElementById("text")
+      this.sentence_information.previous_chunks = correction[0].split("<br>")
+      const chunk_before_correction = chunks[this.chunk_number]
+      const chunk_after_correction = correction[0].split("<br>")[this.chunk_number]
+      this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
+      delete this.sentence_information.errors_matching_text.chunk_before_correction
+      text.setHTML(correction[0])
+      const textUnderline = document.getElementById("text-underline")
+      // textUnderline.setHTML(red_sentence)
+      // console.log("red sentence: ", red_sentence)
+      auto_check_text()
+
+      check_clear_message(this.sentence_information)
       set_margin()
       });
     return correctWord
