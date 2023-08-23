@@ -6,9 +6,9 @@ export function get_text() {
   if (html.substring(0, 5) === "<div>") {
     html = html.substring(5)
   }
+  html = html.replace(/<div><br>/g, match => { return "<br>" })
   html = html.replace(/<div>/g, match => { return "<br>" });
   html = html.replace(/<\/div>/g, '').replace(/&nbsp;/g, '');
-  html = html.replace("<br><br>", "<br>")
   return html;
 }
 
