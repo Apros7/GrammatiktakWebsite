@@ -126,8 +126,6 @@ export class VisualError {
     correctWord.addEventListener("click", async () => {
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
-        console.log(this.sentence_information.text_at_correction_time)
-        console.log(this.sentence_information.current_text)
         this.visual_representation.remove()
         // correct_text()
         return;
@@ -145,25 +143,6 @@ export class VisualError {
                                           + number_to_add, this.indexes[1] + number_to_add, errors, this.chunk_number);
       this.sentence_information.current_text = correction[0];
       chunks = correction[0].split("<br>")
-      // for (let j = 0; j < errors.length; j++) {
-      //   const error_id = create_id_from_raw_error(errors[j])
-      //   console.log(error_id, this.id)
-      //     if (error_id !== this.id) {
-      //       const chunk_number = errors[j][4]
-      //       let number_to_add = (chunk_number) * '<br>'.length
-      //       for (let j = 0; j < chunks.length; j++) {
-      //         if (j < chunk_number) { number_to_add += chunks[j].length }
-      //       }
-      //       console.log(error_id)
-      //       const lower_bound = errors[j][2][0] + number_to_add
-      //       const upper_bound = errors[j][2][1] + number_to_add
-      //       console.log("sentence_information_slice: ", this.sentence_information.current_text, this.sentence_information.current_text.slice(lower_bound, upper_bound))
-      //       str_to_put_in.push(`<span class="highlightedWord">${this.sentence_information.current_text.slice(lower_bound, upper_bound)}</span>`);
-      //       indexes.push([lower_bound, upper_bound])
-      //     }
-      // }
-      // console.log(str_to_put_in)
-      // const red_sentence = make_sentence_red(this.sentence_information.current_text, str_to_put_in, indexes);
       this.visual_representation.remove();
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
       const text = document.getElementById("text")
@@ -174,8 +153,6 @@ export class VisualError {
       delete this.sentence_information.errors_matching_text.chunk_before_correction
       text.setHTML(correction[0])
       const textUnderline = document.getElementById("text-underline")
-      // textUnderline.setHTML(red_sentence)
-      // console.log("red sentence: ", red_sentence)
       auto_check_text()
 
       check_clear_message(this.sentence_information)

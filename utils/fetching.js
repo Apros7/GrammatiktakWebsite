@@ -13,7 +13,6 @@ export function fetchFeedback(service_url, feedback = null) {
 }
 
 export async function fetchData(service_url, text) {
-  console.log("CORRECTING FOR: ", text)
     let object = {"sentence": text, "feedback": null};
     const response = await fetch(service_url, {
       method: 'POST',

@@ -117,10 +117,7 @@ text.addEventListener('input', () => {
 });
 
 function init_make_sentence_red(sentence, errors) {
-  console.log("Making red sentence...")
-  console.log(sentence)
   let chunks = sentence.split("<br>")
-  console.log(chunks)
   let str_to_put_in = []
   let indexes = []
   for (let i = 0; i < errors.length; i++) {
@@ -132,7 +129,6 @@ function init_make_sentence_red(sentence, errors) {
     const word = errors[i][0];
     const lower_bound = errors[i][2][0] + number_to_add
     const upper_bound = errors[i][2][1] + number_to_add
-    console.log(lower_bound, upper_bound)
     str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
     indexes.push([lower_bound, upper_bound])
   }
@@ -170,24 +166,12 @@ async function display_errors() {
 
 async function check_each_chunk() {
 
-  console.log("Previous chunks: ", sentence_information.previous_chunks)
-  console.log("Current text: ", get_text())
-  console.log(text.innerText)
-  console.log(sentence_information.errors_from_backend)
-
-
   const chunks = get_text().split("<br>")
   let previous_errors = [...sentence_information.errors_from_backend]
   sentence_information.errors_from_backend = []
 
-  // console.log("CHUNKS: ", chunks)
-  // console.log("Previous chunks loaded as: ", sentence_information.previous_chunks)
-
   let checked_chunks = []
   let not_checked_chunks = []
-
-  // console.log("CHUNKS: ", chunks)
-  // console.log("ERRORS BEFORE: ", previous_errors)
 
   for (let i = 0; i < chunks.length; i++) {
     let foundInPreviousChunks = false;
@@ -231,17 +215,10 @@ async function check_each_chunk() {
   }
 
   // display errors if all done with fetching
-
   if (JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks)) { 
     display_errors()
   }
-
   sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
-
-  // console.log("Checked chunks: ", checked_chunks)
-  // console.log("Not checked chunks: ", not_checked_chunks)
-  // console.log("Previous chunks set to: ", sentence_information.previous_chunks)
-  // console.log("ERRORS AFTER: ", sentence_information.errors_from_backend)
 
   return [checked_chunks, not_checked_chunks]
 }
