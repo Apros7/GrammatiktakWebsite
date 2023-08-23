@@ -1,5 +1,5 @@
 
-export function correct_sentence(sentence, string_to_put_in, start_index, end_index, errors) {
+export function correct_sentence(sentence, string_to_put_in, start_index, end_index, errors, corrected_chunk_number) {
   if (start_index === end_index) {
     // no characters need to be added, return the original sentence and errors
     return [sentence, errors];
@@ -16,8 +16,9 @@ export function correct_sentence(sentence, string_to_put_in, start_index, end_in
   }
   const corrected_sentence = sentence.slice(0, start_index) + string_to_put_in + sentence.slice(end_index)
   if (end_index !== start_index + string_to_put_in.length) {
-    const difference = start_index + string_to_put_in.length - end_index
     for (let i = 0; i < errors.length; i++) {
+      let difference = 0
+      if (corrected_chunk_number === errors[i][4]) { difference += start_index + string_to_put_in.length - end_index }
       if (errors[i][2][0] > start_index) {
         errors[i][2][0] = errors[i][2][0] + difference
         errors[i][2][1] = errors[i][2][1] + difference
