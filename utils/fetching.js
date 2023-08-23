@@ -12,8 +12,9 @@ export function fetchFeedback(service_url, feedback = null) {
     });
 }
 
-export async function fetchData(service_url) {
-    let object = {"sentence": get_text(), "feedback": null};
+export async function fetchData(service_url, text) {
+  console.log("CORRECTING FOR: ", text)
+    let object = {"sentence": text, "feedback": null};
     const response = await fetch(service_url, {
       method: 'POST',
       headers: {
@@ -40,7 +41,7 @@ function create_fetching_error_message() {
 
 export function handle_fetching_error(status, service_url) {
   const correctTextButton = document.querySelector(".submit-button")
-  correctTextButton.innerText = "Ret min tekst";
+  // correctTextButton.innerText = "Ret min tekst";
   if (status !== "error") {return status}
   create_fetching_error_message()
   // sent auto feedback in case of error
