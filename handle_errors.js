@@ -2,19 +2,24 @@
 import { set_margin } from "/utils/page_control.js";
 import { get_text } from "/utils/retrieve_text.js";
 import { fetchData, fetchFeedback, handle_fetching_error } from "/utils/fetching.js"
-import { make_sentence_red, VisualError } from "/utils/visualisation_errors.js";
-import { check_clear_message, simulateProgress} from "/utils/visualisation_other.js"
+import { make_sentence_red, VisualError, should_visualize_id } from "/utils/visualisation_errors.js";
+import { check_clear_message, simulateProgress, activate_spinner, stop_spinner } from "/utils/visualisation_other.js"
+import { unnestErrors } from "/utils/helper_functions.js"
 
-// let service_url = "http://127.0.0.1:5000/";
-let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+let service_url = "http://127.0.0.1:5000/";
+// let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
+let cursor_position = 5
 let sentence_information = {
     text_at_correction_time: "",
     current_text: "",
     corrected_errors: [],
-    errors: []
+    errors_from_backend: [],
+    removed_error_ids: [],
+    previous_chunks: [],
+    errors_matching_text: {}
 }
 
 set_margin()
@@ -53,10 +58,19 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 const text = document.querySelector(".text")
+const textUnderline = document.getElementById("text-underline")
 const placeholder = document.querySelector(".placeholder")
-const correctTextButton = document.querySelector(".submit-button")
+// const correctTextButton = document.querySelector(".submit-button")
 const copyButton = document.querySelector(".copy-button");
 const rightColumn = document.querySelector(".right-column");
+
+setInterval(() => {
+  if (text.innerHTML.trim() === '') {
+    textUnderline.style.marginTop = '-3.2em'
+  } else {
+    textUnderline.style.marginTop = '0em'
+  }
+}, 10)
 
 copyButton.addEventListener("click", () => {
     navigator.clipboard.writeText(document.querySelector(".text").innerText).then(() => {
@@ -69,9 +83,9 @@ copyButton.addEventListener("click", () => {
     });
   });
 
-correctTextButton.addEventListener("click", () => {
-    correct_text();
-  })
+// correctTextButton.addEventListener("click", () => {
+//     correct_text();
+//   })
 
 // code for clear and back button:
 const back_button = document.querySelector(".back-button");
@@ -103,42 +117,149 @@ text.addEventListener('input', () => {
 });
 
 function init_make_sentence_red(sentence, errors) {
-    let str_to_put_in = []
-    let indexes = []
-    for (let i = 0; i < errors.length; i++) {
-        const word = errors[i][0];
-        const lower_bound = errors[i][2][0]
-        const upper_bound = errors[i][2][1]
-        str_to_put_in.push(`<span style="color: red">${sentence.slice(lower_bound, upper_bound)}</span>`);
-        indexes.push([lower_bound, upper_bound])
-    }
-    return make_sentence_red(sentence, str_to_put_in, indexes)
-}
-
-export function correct_text() {
-    let text_at_correction_time = get_text();
-    rightColumn.innerHTML = "";
-    correctTextButton.textContent = "Retter din tekst...";
-    main(text_at_correction_time);
-}
-
-async function main(text_at_correction_time) {
-  sentence_information.corrected_errors = []
-  const progress_interval = simulateProgress(text_at_correction_time);
-  sentence_information.text_at_correction_time = get_text()
-  errors = await fetchData(service_url)
-  sentence_information.errors = errors
-  handle_fetching_error(errors)
-  clearInterval(progress_interval)
-  document.getElementById("loading-screen").style.display = "none";
-
-  let sentence = get_text()
-  text.setHTML(init_make_sentence_red(sentence, errors))
-
-  // Make errors //
+  console.log("Making red sentence...")
+  console.log(sentence)
+  let chunks = sentence.split("<br>")
+  console.log(chunks)
+  let str_to_put_in = []
+  let indexes = []
   for (let i = 0; i < errors.length; i++) {
-    rightColumn.append((new VisualError(errors[i], sentence_information, i)).visual_representation)
+    const chunk_number = errors[i][4]
+    let number_to_add = (chunk_number) * '<br>'.length
+    for (let j = 0; j < chunks.length; j++) {
+      if (j < chunk_number) { number_to_add += chunks[j].length }
+    }
+    const word = errors[i][0];
+    const lower_bound = errors[i][2][0] + number_to_add
+    const upper_bound = errors[i][2][1] + number_to_add
+    console.log(lower_bound, upper_bound)
+    str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
+    indexes.push([lower_bound, upper_bound])
+  }
+  return make_sentence_red(sentence, str_to_put_in, indexes)
+}
+
+// export async function correct_text() {
+//   let text_at_correction_time = get_text();
+//   rightColumn.innerHTML = "";
+//   correctTextButton.textContent = "Retter din tekst...";
+//   sentence_information.corrected_errors = []
+//   // const progress_interval = simulateProgress(text_at_correction_time);
+//   sentence_information.text_at_correction_time = get_text()
+//   errors = await fetchData(service_url)
+//   display_errors()
+// }
+
+async function display_errors() {
+  let errors = await unnestErrors(sentence_information)
+  rightColumn.innerHTML = "";
+  handle_fetching_error(errors)
+
+  const red_sentence = await init_make_sentence_red(get_text(), errors)
+  textUnderline.setHTML(red_sentence)
+  for (let i = 0; i < errors.length; i++) {
+    const visualErrorInstance = new VisualError(errors[i], sentence_information, i)
+    if (should_visualize_id(visualErrorInstance)) {
+      rightColumn.append(visualErrorInstance.visual_representation)
+    }
   }
   
-  check_clear_message()
+  check_clear_message(sentence_information)
+  set_margin()
 }
+
+async function check_each_chunk() {
+
+  console.log("Previous chunks: ", sentence_information.previous_chunks)
+  console.log("Current text: ", get_text())
+  console.log(text.innerText)
+  console.log(sentence_information.errors_from_backend)
+
+
+  const chunks = get_text().split("<br>")
+  let previous_errors = [...sentence_information.errors_from_backend]
+  sentence_information.errors_from_backend = []
+
+  // console.log("CHUNKS: ", chunks)
+  // console.log("Previous chunks loaded as: ", sentence_information.previous_chunks)
+
+  let checked_chunks = []
+  let not_checked_chunks = []
+
+  // console.log("CHUNKS: ", chunks)
+  // console.log("ERRORS BEFORE: ", previous_errors)
+
+  for (let i = 0; i < chunks.length; i++) {
+    let foundInPreviousChunks = false;
+
+    for (let j = 0; j < sentence_information.previous_chunks.length; j++) {
+      if (chunks[i] === sentence_information.previous_chunks[j]) {
+        foundInPreviousChunks = true;
+        break;
+      }
+    }
+    if (chunks[i].trim().length === 0) {
+      checked_chunks.push("")
+      sentence_information.errors_from_backend.push([])
+    }
+    else if (foundInPreviousChunks) {
+      checked_chunks.push(chunks[i]);
+      sentence_information.errors_from_backend.push(sentence_information.errors_matching_text[chunks[i]])
+    } else {
+      not_checked_chunks.push(chunks[i]);
+      const errors = await fetchData(service_url, chunks[i])
+      sentence_information.errors_matching_text[chunks[i]] = errors
+      const currentTextContent = await get_text().split("<br>")
+      if (currentTextContent.length !== chunks.length || currentTextContent[i] !== chunks[i]) {
+        continue;
+      }
+      sentence_information.errors_from_backend.push(errors)
+    }
+  }
+
+  sentence_information.previous_chunks = checked_chunks.concat(not_checked_chunks);
+  
+  // bug with errors being undefined.
+  if (sentence_information.previous_chunks.length === sentence_information.errors_from_backend.length) {
+    let new_prev_chunks = []
+    for (let i = 0; i < checked_chunks.concat(not_checked_chunks).length; i++) {
+      if (typeof sentence_information.errors_from_backend[i] !== "undefined") {
+        new_prev_chunks.push(sentence_information.previous_chunks[i])
+      }
+    }
+    sentence_information.previous_chunks = new_prev_chunks
+  }
+
+  // display errors if all done with fetching
+
+  if (JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks)) { 
+    display_errors()
+  }
+
+  sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
+
+  // console.log("Checked chunks: ", checked_chunks)
+  // console.log("Not checked chunks: ", not_checked_chunks)
+  // console.log("Previous chunks set to: ", sentence_information.previous_chunks)
+  // console.log("ERRORS AFTER: ", sentence_information.errors_from_backend)
+
+  return [checked_chunks, not_checked_chunks]
+}
+
+export async function auto_check_text() {
+  activate_spinner()
+  // document.getElementById('text').innerHTML = 'Hej <span class="highlightedWord">jeg hedder Lucas</span>'
+  let [checked, not_checked] = await check_each_chunk() 
+}
+
+// const invisibleText = document.getElementById('invisibleText');
+// const backgroundText = document.getElementById('backgroundText');
+
+// invisibleText.addEventListener('input', () => {
+//   backgroundText.innerHTML = invisibleText.innerHTML;
+//   set_margin();
+// });
+
+// backgroundText.innerHTML = invisibleText.innerHTML;
+
+setInterval(auto_check_text, 1000);
