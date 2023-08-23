@@ -6,8 +6,8 @@ import { make_sentence_red, VisualError, should_visualize_id } from "/utils/visu
 import { check_clear_message, simulateProgress, activate_spinner, stop_spinner } from "/utils/visualisation_other.js"
 import { unnestErrors } from "/utils/helper_functions.js"
 
-let service_url = "http://127.0.0.1:5000/";
-// let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+// let service_url = "http://127.0.0.1:5000/";
+let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
