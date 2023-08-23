@@ -16,19 +16,25 @@
             <div class="intro-text">Skriv gerne, hvad vi skal gøre bedre i vores feedback felt.</div>
         </section>
         <section class="text-and-recommendations">
-            <div class="left-column">
-                <div class="information-text">Her er din tekst</div> 
-                <div class="placeholder">Skriv eller kopier din tekst her...</div>
-                <div id="text" class="text" contenteditable="true" tabindex="1" autofocus="autofocus"></div>
+            <div id="left-column" class="left-column">
+                <div class="information-text">Skriv din tekst herunder:</div> 
+                <div class="placeholder">Skriv eller kopier din tekst her...</div> <!-- Not present currently -->
+                <!-- <div id="invisibleText" class="invisible-text" contenteditable="true" tabindex="1" autofocus="autofocus"></div>
+                <div id="backgroundText" class="background-text"></div> -->
+                <div class="text-wrapper">
+                    <!-- <div class="placeholder2">Skriv eller kopier din tekst her...</div> -->
+                    <div id="text-underline" class="text-underline"></div>
+                    <div id="text" class="text" contenteditable="true" tabindex="1" autofocus="autofocus"></div>
+                </div>
                 <div class="text-buttons">
                     <div id="back-button" class="back-button">&#8592;</div>
                     <div class="clear-button">Slet</div>
                     <div class="copy-button">Kopier tekst</div>
-                    <div class="submit-button">Ret min tekst</div>
+                    <!-- <div class="submit-button">Ret min tekst</div> -->
                 </div>
             </div>
-            <div class="right-column">
-                <div class="allClearText">Det ser ud til, at din tekst er fejlfri 😊.</div>
+            <div id="right-column" class="right-column">
+                <div id="allClearText" class="allClearText">Det ser ud til, at din tekst er fejlfri 😊.</div>
             </div>
         </section>
         <section class="feedback">
