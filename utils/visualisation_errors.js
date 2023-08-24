@@ -152,7 +152,6 @@ export class VisualError {
       delete this.sentence_information.errors_matching_text.chunk_before_correction
     
       let chunk_errors = this.sentence_information.errors_matching_text[chunk_before_correction]
-      console.log("Chunk errors: ", chunk_errors)
       let errors_other_than_this = []
       for (let i = 0; i < chunk_errors.length; i++) {
         const id = create_id_from_raw_error(chunk_errors[i])
@@ -161,8 +160,6 @@ export class VisualError {
         }
       }
       this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
-      // this.sentence_information.errors_from_backend[this.chunk_number] = errors_other_than_this
-      // console.log("Backend errors: ", this.sentence_information.errors_from_backend)
       
       text.setHTML(correction[0])
       const textUnderline = document.getElementById("text-underline")

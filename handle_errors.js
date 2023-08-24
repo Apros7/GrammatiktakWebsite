@@ -59,7 +59,6 @@ document.addEventListener("DOMContentLoaded", function() {
 const text = document.querySelector(".text")
 const textUnderline = document.getElementById("text-underline")
 const placeholder = document.querySelector(".placeholder")
-// const correctTextButton = document.querySelector(".submit-button")
 const copyButton = document.querySelector(".copy-button");
 const rightColumn = document.querySelector(".right-column");
 
@@ -81,10 +80,6 @@ copyButton.addEventListener("click", () => {
       console.log('Failed to copy text: ', err);
     });
   });
-
-// correctTextButton.addEventListener("click", () => {
-//     correct_text();
-//   })
 
 // code for clear and back button:
 const back_button = document.querySelector(".back-button");
@@ -164,9 +159,6 @@ export async function display_errors() {
 }
 
 async function check_each_chunk() {
-  // console.log("Starting to check...")
-  // console.log(sentence_information)
-
   const chunks = get_text().split("<br>")
   sentence_information.errors_from_backend = []
 
@@ -182,20 +174,14 @@ async function check_each_chunk() {
         break;
       }
     }
-    // console.log(sentence_information.previous_chunks)
-    // console.log(chunks[i], foundInPreviousChunks)
+
     if (chunks[i].trim().length === 0) {
       checked_chunks.push("")
       sentence_information.errors_from_backend.push([])
     }
     else if (foundInPreviousChunks) {
       checked_chunks.push(chunks[i]);
-      // console.log(chunks[i])
-      // console.log("keys: ", Object.keys(sentence_information.errors_matching_text))
-      // console.log("values: ", Object.values(sentence_information.errors_matching_text))
-      // console.log(Object.keys(sentence_information.errors_matching_text).includes(chunks[i]))
       const matching_errors = sentence_information.errors_matching_text[chunks[i]]
-      // console.log(matching_errors)
       sentence_information.errors_from_backend.push(matching_errors)
     } else {
       not_checked_chunks.push(chunks[i]);
@@ -209,8 +195,6 @@ async function check_each_chunk() {
     }
   }
   sentence_information.previous_chunks = checked_chunks.concat(not_checked_chunks);
-  // console.log("CHECKED CHUNKS: ", sentence_information.previous_chunks)
-  // console.log("Errors: ", sentence_information.errors_from_backend)
   
   // bug with errors being undefined.
   if (sentence_information.previous_chunks.length === sentence_information.errors_from_backend.length) {
@@ -221,7 +205,6 @@ async function check_each_chunk() {
       }
     }
     sentence_information.previous_chunks = new_prev_chunks
-    // console.log(new_prev_chunks)
   }
 
 
@@ -231,25 +214,12 @@ async function check_each_chunk() {
   }
   sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
 
-  // console.log(sentence_information.previous_chunks)
-
   return [checked_chunks, not_checked_chunks]
 }
 
 export async function auto_check_text() {
   activate_spinner()
-  // document.getElementById('text').innerHTML = 'Hej <span class="highlightedWord">jeg hedder Lucas</span>'
-  let [checked, not_checked] = await check_each_chunk() 
+let [checked, not_checked] = await check_each_chunk() 
 }
-
-// const invisibleText = document.getElementById('invisibleText');
-// const backgroundText = document.getElementById('backgroundText');
-
-// invisibleText.addEventListener('input', () => {
-//   backgroundText.innerHTML = invisibleText.innerHTML;
-//   set_margin();
-// });
-
-// backgroundText.innerHTML = invisibleText.innerHTML;
 
 setInterval(auto_check_text, 1000);
