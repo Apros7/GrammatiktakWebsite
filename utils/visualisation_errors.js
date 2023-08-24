@@ -1,6 +1,6 @@
 import { set_margin } from "../utils/page_control.js";
 import { check_clear_message } from "./visualisation_other.js"
-import { auto_check_text } from "../handle_errors.js"
+import { auto_check_text, display_errors } from "../handle_errors.js"
 import { findEmojiIndexes } from "./correct_text.js"
 import { get_text } from "./retrieve_text.js";
 import { correct_sentence } from "./correct_text.js";
@@ -142,20 +142,34 @@ export class VisualError {
       const correction = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0] 
                                           + number_to_add, this.indexes[1] + number_to_add, errors, this.chunk_number);
       this.sentence_information.current_text = correction[0];
-      chunks = correction[0].split("<br>")
       this.visual_representation.remove();
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
       const text = document.getElementById("text")
       this.sentence_information.previous_chunks = correction[0].split("<br>")
       const chunk_before_correction = chunks[this.chunk_number]
       const chunk_after_correction = correction[0].split("<br>")[this.chunk_number]
-      this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
+      // this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
       delete this.sentence_information.errors_matching_text.chunk_before_correction
+    
+      let chunk_errors = this.sentence_information.errors_matching_text[chunk_before_correction]
+      console.log("Chunk errors: ", chunk_errors)
+      let errors_other_than_this = []
+      for (let i = 0; i < chunk_errors.length; i++) {
+        const id = create_id_from_raw_error(chunk_errors[i])
+        if (id !== this.id) {
+          errors_other_than_this.push(chunk_errors[i])
+        }
+      }
+      this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
+      // this.sentence_information.errors_from_backend[this.chunk_number] = errors_other_than_this
+      // console.log("Backend errors: ", this.sentence_information.errors_from_backend)
+      
       text.setHTML(correction[0])
       const textUnderline = document.getElementById("text-underline")
-      auto_check_text()
+      // auto_check_text()
 
       check_clear_message(this.sentence_information)
+      display_errors()
       set_margin()
       });
     return correctWord

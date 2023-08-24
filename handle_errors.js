@@ -1,4 +1,3 @@
-
 import { set_margin } from "/utils/page_control.js";
 import { get_text } from "/utils/retrieve_text.js";
 import { fetchData, fetchFeedback, handle_fetching_error } from "/utils/fetching.js"
@@ -146,7 +145,7 @@ function init_make_sentence_red(sentence, errors) {
 //   display_errors()
 // }
 
-async function display_errors() {
+export async function display_errors() {
   let errors = await unnestErrors(sentence_information)
   rightColumn.innerHTML = "";
   handle_fetching_error(errors)
@@ -165,9 +164,10 @@ async function display_errors() {
 }
 
 async function check_each_chunk() {
+  // console.log("Starting to check...")
+  // console.log(sentence_information)
 
   const chunks = get_text().split("<br>")
-  let previous_errors = [...sentence_information.errors_from_backend]
   sentence_information.errors_from_backend = []
 
   let checked_chunks = []
@@ -182,13 +182,21 @@ async function check_each_chunk() {
         break;
       }
     }
+    // console.log(sentence_information.previous_chunks)
+    // console.log(chunks[i], foundInPreviousChunks)
     if (chunks[i].trim().length === 0) {
       checked_chunks.push("")
       sentence_information.errors_from_backend.push([])
     }
     else if (foundInPreviousChunks) {
       checked_chunks.push(chunks[i]);
-      sentence_information.errors_from_backend.push(sentence_information.errors_matching_text[chunks[i]])
+      // console.log(chunks[i])
+      // console.log("keys: ", Object.keys(sentence_information.errors_matching_text))
+      // console.log("values: ", Object.values(sentence_information.errors_matching_text))
+      // console.log(Object.keys(sentence_information.errors_matching_text).includes(chunks[i]))
+      const matching_errors = sentence_information.errors_matching_text[chunks[i]]
+      // console.log(matching_errors)
+      sentence_information.errors_from_backend.push(matching_errors)
     } else {
       not_checked_chunks.push(chunks[i]);
       const errors = await fetchData(service_url, chunks[i])
@@ -200,8 +208,9 @@ async function check_each_chunk() {
       sentence_information.errors_from_backend.push(errors)
     }
   }
-
   sentence_information.previous_chunks = checked_chunks.concat(not_checked_chunks);
+  // console.log("CHECKED CHUNKS: ", sentence_information.previous_chunks)
+  // console.log("Errors: ", sentence_information.errors_from_backend)
   
   // bug with errors being undefined.
   if (sentence_information.previous_chunks.length === sentence_information.errors_from_backend.length) {
@@ -212,13 +221,17 @@ async function check_each_chunk() {
       }
     }
     sentence_information.previous_chunks = new_prev_chunks
+    // console.log(new_prev_chunks)
   }
 
+
   // display errors if all done with fetching
-  if (JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks)) { 
+  if (JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks) && chunks.length === sentence_information.errors_from_backend.length) { 
     display_errors()
   }
   sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
+
+  // console.log(sentence_information.previous_chunks)
 
   return [checked_chunks, not_checked_chunks]
 }
