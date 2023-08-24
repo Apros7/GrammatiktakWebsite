@@ -219,7 +219,7 @@ async function check_each_chunk() {
 
 export async function auto_check_text() {
   activate_spinner()
-let [checked, not_checked] = await check_each_chunk() 
+  let [checked, not_checked] = await check_each_chunk() 
 }
 
 setInterval(auto_check_text, 1000);
