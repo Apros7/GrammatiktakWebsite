@@ -3,7 +3,7 @@ export function create_id_from_raw_error(error) {
 }
 
 function should_visualize_id(id, sentence_information) {
-  if (sentence_information.removed_error_ids.includes(id) || sentence_information.corrected_errors.includes(id)) {return false}
+  if (sentence_information.removed_error_ids.includes(id)) {return false}
   return true
 }
 
