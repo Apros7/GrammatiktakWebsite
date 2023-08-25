@@ -219,7 +219,6 @@ async function check_each_chunk() {
   const text_not_changed = JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks) && chunks.length === sentence_information.errors_from_backend.length
   const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
   if (text_not_changed && !waiting_for_backend) { 
-    console.log(sentence_information.errors_matching_text)
     display_errors()
   }
   sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
