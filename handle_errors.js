@@ -18,7 +18,8 @@ let sentence_information = {
     errors_from_backend: [],
     removed_error_ids: [],
     previous_chunks: [],
-    errors_matching_text: {}
+    errors_matching_text: {},
+    waiting_for_backend: {}
 }
 
 set_margin()
@@ -185,8 +186,14 @@ async function check_each_chunk() {
       sentence_information.errors_from_backend.push(matching_errors)
     } else {
       not_checked_chunks.push(chunks[i]);
-      const errors = await fetchData(service_url, chunks[i])
-      sentence_information.errors_matching_text[chunks[i]] = errors
+      let errors = []
+      if (!sentence_information.waiting_for_backend[chunks[i]]) {
+        sentence_information.waiting_for_backend[chunks[i]] = true
+        errors = await fetchData(service_url, chunks[i], sentence_information)
+      } else {
+        continue
+      }
+      // sentence_information.errors_matching_text[chunks[i]] = errors
       const currentTextContent = await get_text().split("<br>")
       if (currentTextContent.length !== chunks.length || currentTextContent[i] !== chunks[i]) {
         continue;
@@ -209,7 +216,10 @@ async function check_each_chunk() {
 
 
   // display errors if all done with fetching
-  if (JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks) && chunks.length === sentence_information.errors_from_backend.length) { 
+  const text_not_changed = JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks) && chunks.length === sentence_information.errors_from_backend.length
+  const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  if (text_not_changed && !waiting_for_backend) { 
+    console.log(sentence_information.errors_matching_text)
     display_errors()
   }
   sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
