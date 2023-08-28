@@ -216,9 +216,10 @@ async function check_each_chunk() {
 
 
   // display errors if all done with fetching
-  const text_not_changed = JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks) && chunks.length === sentence_information.errors_from_backend.length
-  const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
-  if (text_not_changed && !waiting_for_backend) { 
+  // const text_not_changed = JSON.stringify(get_text().split("<br>")) === JSON.stringify(chunks) && chunks.length === sentence_information.errors_from_backend.length
+  // const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  // if (text_not_changed && !waiting_for_backend) { 
+  if (sentence_information.errors_from_backend.length > 0) {
     display_errors()
   }
   sentence_information.text_at_correction_time = sentence_information.previous_chunks.join("<br>")
@@ -227,7 +228,10 @@ async function check_each_chunk() {
 }
 
 export async function auto_check_text() {
-  activate_spinner()
+  if (sentence_information.errors_from_backend.length === 0) {
+    activate_spinner()
+  }
+  check_clear_message()
   let [checked, not_checked] = await check_each_chunk() 
 }
 
