@@ -6,7 +6,27 @@ import { get_text } from "./retrieve_text.js";
 import { correct_sentence } from "./correct_text.js";
 import { create_id_from_raw_error, unnestErrors } from "./helper_functions.js"
 
-export function make_sentence_red(sentence, string_to_put_in, indexes) {
+export function init_make_sentence_red(sentence, errors) {
+  let chunks = sentence.split("<br>")
+  let str_to_put_in = []
+  let indexes = []
+  for (let i = 0; i < errors.length; i++) {
+    const chunk_number = errors[i][4]
+    let number_to_add = (chunk_number) * '<br>'.length
+    for (let j = 0; j < chunks.length; j++) {
+      if (j < chunk_number) { number_to_add += chunks[j].length }
+    }
+    const word = errors[i][0];
+    const lower_bound = errors[i][2][0] + number_to_add
+    const upper_bound = errors[i][2][1] + number_to_add
+    str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
+    indexes.push([lower_bound, upper_bound])
+  }
+  const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes)
+  return red_sentence
+}
+
+function make_sentence_red(sentence, string_to_put_in, indexes) {
     const emojiIndexes = findEmojiIndexes(sentence);
     let result = "";
     let previousIndex = 0;
@@ -43,6 +63,11 @@ export function should_visualize_id(VisualErrorInstance) {
   return true
 }
 
+function reset_underline() {
+  const textUnderline = document.getElementById("text-underline")
+  textUnderline.setHTML("")
+}
+
 // Sentence information is an object as it allows for change without reinitilizing
 // Has to include text_at_correction_time, current_text, corrected_errors
 
@@ -77,23 +102,11 @@ export class VisualError {
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
         this.visual_representation.remove()
-        // correct_text()
         return;
       }
-      let str_to_put_in = []
-      let indexes = []
       this.sentence_information.corrected_errors.push(this.error_index)
       let errors = await unnestErrors(this.sentence_information)
-      //sentence_information.errors findes ikke
-      for (let j = 0; j < errors.length; j++) {
-          if (j !== this.error_index && !this.sentence_information.corrected_errors.includes(j)) {
-            const lower_bound = errors[j][2][0]
-            const upper_bound = errors[j][2][1]
-            str_to_put_in.push(`<span class="highlightedWord">${this.sentence_information.current_text.slice(lower_bound, upper_bound)}</span>`);
-            indexes.push([lower_bound, upper_bound])
-          }
-      }
-      const red_sentence = make_sentence_red(this.sentence_information.current_text, str_to_put_in, indexes);
+      const red_sentence = init_make_sentence_red(get_text(), errors);
       this.visual_representation.remove()
       this.sentence_information.removed_error_ids.push(this.id)
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
@@ -127,7 +140,6 @@ export class VisualError {
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
         this.visual_representation.remove()
-        // correct_text()
         return;
       }
       let str_to_put_in = []
@@ -163,7 +175,9 @@ export class VisualError {
       
       text.setHTML(correction[0])
       const textUnderline = document.getElementById("text-underline")
-      // auto_check_text()
+      errors = await unnestErrors(this.sentence_information)
+      const red_sentence = init_make_sentence_red(get_text(), errors);
+      textUnderline.setHTML(red_sentence)
 
       check_clear_message(this.sentence_information)
       display_errors()

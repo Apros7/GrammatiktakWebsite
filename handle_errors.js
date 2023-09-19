@@ -1,7 +1,7 @@
 import { set_margin } from "/utils/page_control.js";
 import { get_text } from "/utils/retrieve_text.js";
 import { fetchData, fetchFeedback, handle_fetching_error } from "/utils/fetching.js"
-import { make_sentence_red, VisualError, should_visualize_id } from "/utils/visualisation_errors.js";
+import { init_make_sentence_red, VisualError, should_visualize_id } from "/utils/visualisation_errors.js";
 import { check_clear_message, simulateProgress, activate_spinner, stop_spinner } from "/utils/visualisation_other.js"
 import { unnestErrors } from "/utils/helper_functions.js"
 
@@ -110,25 +110,6 @@ text.addEventListener('input', () => {
       text.style.marginTop = "0";
     }
 });
-
-function init_make_sentence_red(sentence, errors) {
-  let chunks = sentence.split("<br>")
-  let str_to_put_in = []
-  let indexes = []
-  for (let i = 0; i < errors.length; i++) {
-    const chunk_number = errors[i][4]
-    let number_to_add = (chunk_number) * '<br>'.length
-    for (let j = 0; j < chunks.length; j++) {
-      if (j < chunk_number) { number_to_add += chunks[j].length }
-    }
-    const word = errors[i][0];
-    const lower_bound = errors[i][2][0] + number_to_add
-    const upper_bound = errors[i][2][1] + number_to_add
-    str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
-    indexes.push([lower_bound, upper_bound])
-  }
-  return make_sentence_red(sentence, str_to_put_in, indexes)
-}
 
 // export async function correct_text() {
 //   let text_at_correction_time = get_text();
