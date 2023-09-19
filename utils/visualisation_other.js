@@ -32,17 +32,29 @@ export function simulateProgress(sentence) {
 }
 
 export function activate_spinner() {
+  const loaderElement = document.querySelector('.spinner-background');
   const rightColumn = document.querySelector('.text-and-recommendations .right-column');
+  if (rightColumn.contains(loaderElement)) { return }
+
+  const loader = document.createElement("div");
+  loader.classList.add("loader")
+  for (let i = 1; i < 101; i++) {
+    const el = document.createElement("div");
+    el.classList.add("circle")
+    el.style.setProperty('--i', i);
+    loader.appendChild(el)
+  }
+
   rightColumn.innerHTML = "";
   const background = document.createElement("div");
   background.classList.add("spinner-background")
   const text = document.createElement("div");
   text.classList.add("spinner-text")
   text.innerText = "Vi retter din tekst..."
-  const spinner = document.createElement("div");
-  spinner.classList.add("spinner")
+  // const spinner = document.createElement("div");
+  // spinner.classList.add("spinner")
   // spinner.style.display = 'block';
-  background.appendChild(spinner)
+  background.appendChild(loader)
   background.appendChild(text)
   rightColumn.appendChild(background)
 }
