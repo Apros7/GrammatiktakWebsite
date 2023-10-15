@@ -333,6 +333,7 @@ body {
 }
 
 .go-to-school-data-button {
+  text-decoration: none;
   width: auto;
   padding: 0 20px;
   margin-top: 0em;
