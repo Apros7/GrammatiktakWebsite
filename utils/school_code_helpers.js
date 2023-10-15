@@ -12,6 +12,7 @@ function check_code() {
     const code = schoolDataInput.value;
     if (code_valid(code)) {
         schoolDataInput.style.backgroundColor = "lightGreen";
+        schoolDataInput.value = "";
     } else {
         schoolDataButton.innerHTML = "&#10007;";
         schoolDataInput.style.backgroundColor = "lightCoral";
