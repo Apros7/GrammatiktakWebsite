@@ -4,6 +4,7 @@ import { fetchData, fetchFeedback, handle_fetching_error } from "/utils/fetching
 import { init_make_sentence_red, VisualError, should_visualize_id } from "/utils/visualisation_errors.js";
 import { check_clear_message, simulateProgress, activate_spinner, stop_spinner } from "/utils/visualisation_other.js"
 import { unnestErrors } from "/utils/helper_functions.js"
+import { initalize_input_and_button } from "/utils/school_code_helpers.js"
 
 // let service_url = "http://127.0.0.1:5000/";
 let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
@@ -23,6 +24,7 @@ let sentence_information = {
 }
 
 set_margin()
+initalize_input_and_button()
 
 // Call the set_margin() function whenever a change is detected
 const divElement = document.querySelector('#text');
