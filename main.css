@@ -350,6 +350,36 @@ body {
   background-color: #555;
 }
 
-/* .premium-code-text {
+.premium-code-text {
+  font-family: "Poppins";
+  border: None;
+  width: auto;
+  font-size: 1em;
+  padding: 0 10px;
+  margin-top: 0em;
+  margin-bottom: 0em;
+  border-radius: 2em;
+  background: #f2f2f2;
+  color: #007AF3;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+}
 
-} */
+.edit-or-enter-button {
+  width: auto;
+  padding: 0 20px;
+  margin-top: 0em;
+  margin-bottom: 0em;
+  border-radius: 1.5em;
+  background: #f2f2f2;
+  color: #007AF3;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+}
+
+.edit-or-enter-button:hover {
+  background-color: #555;
+}
