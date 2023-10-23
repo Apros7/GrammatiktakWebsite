@@ -6,8 +6,8 @@ import { check_clear_message, simulateProgress, activate_spinner, stop_spinner }
 import { unnestErrors } from "/utils/helper_functions.js"
 import { initalize_input_and_button } from "/utils/school_code_helpers.js"
 
-let service_url = "http://127.0.0.1:5000/";
-// let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
+// let service_url = "http://127.0.0.1:5000/";
+let service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
 let errors = []
 let originalText = "dette er din tekst"
