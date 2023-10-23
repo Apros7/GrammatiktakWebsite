@@ -15,21 +15,28 @@ export function fetchFeedback(service_url, feedback = null) {
 export async function fetchData(service_url, text, sentence_information) {
   console.log("Correcting: ", text)
   let object = {"sentence": text, "feedback": null};
-  const response = await fetch(service_url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(object)
-  });
-  if (!response.ok) {
-    return "error"
+  try {
+    const response = await fetch(service_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(object)
+    })
+    if (!response.ok) {
+      return "error"
+    }
+    const data = await response.text();
+    const errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
+    sentence_information.waiting_for_backend[text] = false
+    sentence_information.errors_matching_text[text] = errors
+    return errors
+  } catch (error) {
+    console.log(`Error with: "${text}"`);
+    sentence_information.waiting_for_backend[text] = false;
+    sentence_information.errors_matching_text[text] = [];
+    return [];
   }
-  const data = await response.text();
-  const errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
-  sentence_information.waiting_for_backend[text] = false
-  sentence_information.errors_matching_text[text] = errors
-  return errors
 }
 
 function create_fetching_error_message() {
