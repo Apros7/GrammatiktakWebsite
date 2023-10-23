@@ -11,7 +11,7 @@ export async function unnestErrors(sentence_information) {
   let errors = sentence_information.errors_from_backend
   let unnested_errors = []
   for (let i = 0; i < errors.length; i++) {
-    if (typeof errors[i] === 'undefined') { continue }
+    if (typeof errors[i] === 'undefined' || errors[i] === "error") { continue }
     for (let j = 0; j < errors[i].length; j++) {
       const id = create_id_from_raw_error(errors[i][j])
       if (should_visualize_id(id, sentence_information)) {
