@@ -15,10 +15,10 @@ export function fetchFeedback(service_url, feedback = null, text_failed = null) 
 
 export async function fetchData(service_url, text, sentence_information) {
   try {
-    result = await _fetchData(service_url, text, sentence_information)
+    const result = await _fetchData(service_url, text, sentence_information)
     return result
   } catch (error) {
-    console.log(`Error with: "${text}"`);
+    console.log(`Error with: "${text}", ${error}`);
     sentence_information.waiting_for_backend[text] = false;
     sentence_information.errors_matching_text[text] = [];
     fetchFeedback(service_url, "Automatic Feedback: Text Failed", text)
@@ -43,6 +43,7 @@ async function _fetchData(service_url, text, sentence_information) {
   const errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
   sentence_information.waiting_for_backend[text] = false
   sentence_information.errors_matching_text[text] = errors
+  console.log("ERRORS: ", errors)
   return errors
 }
 
