@@ -1,6 +1,6 @@
 import { set_margin } from "/utils/page_control.js";
 import { get_text } from "/utils/retrieve_text.js";
-import { fetchData, fetchFeedback, handle_fetching_error } from "/utils/fetching.js"
+import { fetchData, fetchFeedback } from "/utils/fetching.js"
 import { init_make_sentence_red, VisualError, should_visualize_id } from "/utils/visualisation_errors.js";
 import { check_clear_message, simulateProgress, activate_spinner, stop_spinner } from "/utils/visualisation_other.js"
 import { unnestErrors } from "/utils/helper_functions.js"
@@ -127,7 +127,7 @@ text.addEventListener('input', () => {
 export async function display_errors() {
   let errors = await unnestErrors(sentence_information)
   rightColumn.innerHTML = "";
-  handle_fetching_error(errors)
+  // handle_fetching_error(errors)
 
   const red_sentence = await init_make_sentence_red(get_text(), errors)
   textUnderline.setHTML(red_sentence)
@@ -210,8 +210,18 @@ async function check_each_chunk() {
   return [checked_chunks, not_checked_chunks]
 }
 
+function only_clear_text_in_right_column(rightColumn) {
+  if (rightColumn.childElementCount === 1) {
+    const childElement = rightColumn.firstElementChild;
+    if (childElement.classList.contains('allClearText')) { return true }
+  }
+  return false
+}
+
 export async function auto_check_text() {
-  if (sentence_information.errors_from_backend.length === 0) {
+  const waiting = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  const rightColumn = document.querySelector('.text-and-recommendations .right-column');
+  if ((rightColumn.childElementCount === 0 || only_clear_text_in_right_column(rightColumn)) && waiting) {
     activate_spinner()
   }
   check_clear_message(sentence_information)

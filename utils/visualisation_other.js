@@ -63,10 +63,22 @@ export function stop_spinner() {
   document.querySelector('.text-and-recommendations .right-column').innerHTML = "";
 }
 
+function areAllValuesFalse(obj) {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key) && obj[key] !== false) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function check_clear_message(sentence_information) {
   const rightColumn = document.querySelector('.text-and-recommendations .right-column');
   const chunks = get_text().split("<br>")
-  if (rightColumn.childElementCount === 0 && chunks.length === sentence_information.errors_from_backend.length) {
+  const waiting = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  console.log(sentence_information.waiting_for_backend)
+  console.log(sentence_information.errors_from_backend)
+  if (rightColumn.childElementCount === 0 && chunks.length === sentence_information.errors_from_backend.length && !waiting) {
     rightColumn.innerHTML = ""
     let allClearText = document.createElement("div")
     allClearText.classList.add("allClearText")
