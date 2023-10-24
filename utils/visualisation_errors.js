@@ -65,11 +65,6 @@ export function should_visualize_id(VisualErrorInstance) {
   return true
 }
 
-function reset_underline() {
-  const textUnderline = document.getElementById("text-underline")
-  textUnderline.setHTML("")
-}
-
 // Sentence information is an object as it allows for change without reinitilizing
 // Has to include text_at_correction_time, current_text, corrected_errors
 
@@ -139,8 +134,8 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async () => {
-      // const start_time = (new Date()).getTime() / 1000;
-      // console.log((new Date()).getTime() / 1000 - start_time)
+      const start_time = (new Date()).getTime() / 1000;
+      console.log((new Date()).getTime() / 1000 - start_time)
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
         this.visual_representation.remove()
@@ -149,26 +144,20 @@ export class VisualError {
       let str_to_put_in = []
       let indexes = []
       let chunks = get_text().split("<br>")
-      let number_to_add = (this.chunk_number) * '<br>'.length
-      // console.log((new Date()).getTime() / 1000 - start_time)
-      for (let j = 0; j < chunks.length; j++) {
-        if (j < this.chunk_number) { number_to_add += chunks[j].length }
-      }
       this.sentence_information.corrected_errors.push(this.id)
       let errors = await unnestErrors(this.sentence_information)
-      const correction = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0] 
-                                          + number_to_add, this.indexes[1] + number_to_add, errors, this.chunk_number);
-      this.sentence_information.current_text = correction[0];
+      const corrected_sentence = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0], this.indexes[1], errors, this.chunk_number);
+      this.sentence_information.current_text = corrected_sentence;
       this.visual_representation.remove();
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
-      // console.log((new Date()).getTime() / 1000 - start_time)
+      console.log((new Date()).getTime() / 1000 - start_time)
       const text = document.getElementById("text")
-      this.sentence_information.previous_chunks = correction[0].split("<br>")
+      this.sentence_information.previous_chunks = corrected_sentence.split("<br>")
       const chunk_before_correction = chunks[this.chunk_number]
-      const chunk_after_correction = correction[0].split("<br>")[this.chunk_number]
+      const chunk_after_correction = corrected_sentence.split("<br>")[this.chunk_number]
       // this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
       delete this.sentence_information.errors_matching_text.chunk_before_correction
-      // console.log((new Date()).getTime() / 1000 - start_time)
+      console.log((new Date()).getTime() / 1000 - start_time)
     
       let chunk_errors = this.sentence_information.errors_matching_text[chunk_before_correction]
       let errors_other_than_this = []
@@ -179,19 +168,19 @@ export class VisualError {
         }
       }
       this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
-      // console.log((new Date()).getTime() / 1000 - start_time)
+      console.log((new Date()).getTime() / 1000 - start_time)
       
-      text.setHTML(correction[0])
+      text.setHTML(corrected_sentence)
       const textUnderline = document.getElementById("text-underline")
       errors = await unnestErrors(this.sentence_information)
       const red_sentence = init_make_sentence_red(get_text(), errors);
       textUnderline.setHTML(red_sentence)
-      // console.log((new Date()).getTime() / 1000 - start_time)
+      console.log((new Date()).getTime() / 1000 - start_time)
 
       check_clear_message(this.sentence_information)
       display_errors()
       set_margin()
-      // console.log((new Date()).getTime() / 1000 - start_time)
+      console.log((new Date()).getTime() / 1000 - start_time)
       });
     return correctWord
   }
