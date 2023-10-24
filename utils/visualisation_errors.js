@@ -28,30 +28,6 @@ export function init_make_sentence_red(sentence, errors) {
   return blue_chunks.join("<br>")
 }
 
-// export function init_make_sentence_red2(sentence, errors) {
-
-//   let chunks = sentence.split("<br>")
-//   let str_to_put_in = []
-//   let indexes = []
-//   for (let i = 0; i < errors.length; i++) {
-//     const chunk_number = errors[i][4]
-//     let number_to_add = (chunk_number) * '<br>'.length
-//     for (let j = 0; j < chunks.length; j++) {
-//       if (j < chunk_number) { number_to_add += chunks[j].length }
-//     }
-//     const word = errors[i][0];
-//     console.log(chunks[chunk_number].slice(errors[i][2][0], errors[i][2][1]))
-//     const lower_bound = errors[i][2][0] + number_to_add
-//     const upper_bound = errors[i][2][1] + number_to_add
-//     str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
-//     indexes.push([lower_bound, upper_bound])
-//   }
-//   const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes)
-//   console.log(get_text())
-//   console.log(red_sentence)
-//   return red_sentence
-// }
-
 function make_sentence_red(sentence, string_to_put_in, indexes) {
     const emojiIndexes = findEmojiIndexes(sentence);
     let result = "";
