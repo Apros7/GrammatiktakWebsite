@@ -135,70 +135,44 @@ export class VisualError {
     correctWord.addEventListener("click", async () => {
 
       // instant remove text message
-      console.log("hey1")
       this.sentence_information.corrected_errors.push(this.id)
-      console.log("hey1")
       this.sentence_information.current_text = get_text()
-      console.log("hey1")
       // if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
       //   return;
       // }
-      console.log("hey1")
       let str_to_put_in = []
       let indexes = []
       let chunks = get_text().split("<br>")
-      console.log("hey1")
       let errors = await unnestErrors(this.sentence_information)
-      console.log("hey1")
       const corrected_sentence = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0], this.indexes[1], errors, this.chunk_number);
-      console.log("hey1")
       this.sentence_information.current_text = corrected_sentence;
-      console.log("hey1")
       this.visual_representation.remove();
-      console.log("hey1")
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
-      console.log("hey1")
       const text = document.getElementById("text")
-      console.log("hey1")
       this.sentence_information.previous_chunks = corrected_sentence.split("<br>")
-      console.log("hey1")
       const chunk_before_correction = chunks[this.chunk_number]
-      console.log("hey1")
       const chunk_after_correction = corrected_sentence.split("<br>")[this.chunk_number]
-      console.log("hey1")
       // this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
       delete this.sentence_information.errors_matching_text.chunk_before_correction
-      console.log("hey1")
     
       let chunk_errors = this.sentence_information.errors_matching_text[chunk_before_correction]
-      console.log("hey1")
       let errors_other_than_this = []
-      console.log("hey1")
       for (let i = 0; i < chunk_errors.length; i++) {
         const id = create_id_from_raw_error(chunk_errors[i])
         if (id !== this.id) {
           errors_other_than_this.push(chunk_errors[i])
         }
       }
-      console.log("hey1")
       this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
-      console.log("hey1")
       
       text.setHTML(corrected_sentence)
-      console.log("hey1")
       const textUnderline = document.getElementById("text-underline")
-      console.log("hey1")
       errors = await unnestErrors(this.sentence_information)
-      console.log("hey1")
       const red_sentence = init_make_sentence_red(get_text(), errors);
-      console.log("hey1")
       textUnderline.setHTML(red_sentence)
-      console.log("hey1")
 
       check_clear_message(this.sentence_information)
-      console.log("hey1")
       set_margin()
-      console.log("hey1")
       });
     return correctWord
   }

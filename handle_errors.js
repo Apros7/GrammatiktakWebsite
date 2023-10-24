@@ -113,26 +113,25 @@ text.addEventListener('input', () => {
     }
 });
 
-// export async function correct_text() {
-//   let text_at_correction_time = get_text();
-//   rightColumn.innerHTML = "";
-//   correctTextButton.textContent = "Retter din tekst...";
-//   sentence_information.corrected_errors = []
-//   // const progress_interval = simulateProgress(text_at_correction_time);
-//   sentence_information.text_at_correction_time = get_text()
-//   errors = await fetchData(service_url)
-//   display_errors()
-// }
+function get_unique_errors(errors) {
+  var uniqueItems = {};
+  var uniqueList = errors.filter(function(item) {
+    var key = item.slice(0, 4).join(","); 
+    if (!uniqueItems[key]) { uniqueItems[key] = true; return true; }
+    return false;
+  });
+  return uniqueList
+}
 
 export async function display_errors() {
   let errors = await unnestErrors(sentence_information)
+  let uniqueErrors = get_unique_errors(errors)
   rightColumn.innerHTML = "";
-  // handle_fetching_error(errors)
 
-  const red_sentence = await init_make_sentence_red(get_text(), errors)
+  const red_sentence = await init_make_sentence_red(get_text(), uniqueErrors)
   textUnderline.setHTML(red_sentence)
-  for (let i = 0; i < errors.length; i++) {
-    const visualErrorInstance = new VisualError(errors[i], sentence_information, i)
+  for (let i = 0; i < uniqueErrors.length; i++) {
+    const visualErrorInstance = new VisualError(uniqueErrors[i], sentence_information, i)
     if (should_visualize_id(visualErrorInstance)) {
       rightColumn.append(visualErrorInstance.visual_representation)
     }
