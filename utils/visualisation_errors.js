@@ -140,9 +140,9 @@ export class VisualError {
       console.log("hey1")
       this.sentence_information.current_text = get_text()
       console.log("hey1")
-      if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
-        return;
-      }
+      // if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
+      //   return;
+      // }
       console.log("hey1")
       let str_to_put_in = []
       let indexes = []
