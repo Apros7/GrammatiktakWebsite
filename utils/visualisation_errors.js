@@ -134,30 +134,27 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async () => {
-      const start_time = (new Date()).getTime() / 1000;
-      console.log((new Date()).getTime() / 1000 - start_time)
+
+      // instant remove text message
+      this.sentence_information.corrected_errors.push(this.id)
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
-        this.visual_representation.remove()
         return;
       }
       let str_to_put_in = []
       let indexes = []
       let chunks = get_text().split("<br>")
-      this.sentence_information.corrected_errors.push(this.id)
       let errors = await unnestErrors(this.sentence_information)
       const corrected_sentence = correct_sentence(this.sentence_information.current_text, this.right_word, this.indexes[0], this.indexes[1], errors, this.chunk_number);
       this.sentence_information.current_text = corrected_sentence;
       this.visual_representation.remove();
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
-      console.log((new Date()).getTime() / 1000 - start_time)
       const text = document.getElementById("text")
       this.sentence_information.previous_chunks = corrected_sentence.split("<br>")
       const chunk_before_correction = chunks[this.chunk_number]
       const chunk_after_correction = corrected_sentence.split("<br>")[this.chunk_number]
       // this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
       delete this.sentence_information.errors_matching_text.chunk_before_correction
-      console.log((new Date()).getTime() / 1000 - start_time)
     
       let chunk_errors = this.sentence_information.errors_matching_text[chunk_before_correction]
       let errors_other_than_this = []
@@ -168,19 +165,15 @@ export class VisualError {
         }
       }
       this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
-      console.log((new Date()).getTime() / 1000 - start_time)
       
       text.setHTML(corrected_sentence)
       const textUnderline = document.getElementById("text-underline")
       errors = await unnestErrors(this.sentence_information)
       const red_sentence = init_make_sentence_red(get_text(), errors);
       textUnderline.setHTML(red_sentence)
-      console.log((new Date()).getTime() / 1000 - start_time)
 
       check_clear_message(this.sentence_information)
-      display_errors()
       set_margin()
-      console.log((new Date()).getTime() / 1000 - start_time)
       });
     return correctWord
   }
