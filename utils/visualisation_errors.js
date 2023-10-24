@@ -7,24 +7,50 @@ import { correct_sentence } from "./correct_text.js";
 import { create_id_from_raw_error, unnestErrors } from "./helper_functions.js"
 
 export function init_make_sentence_red(sentence, errors) {
-  let chunks = sentence.split("<br>")
-  let str_to_put_in = []
-  let indexes = []
-  for (let i = 0; i < errors.length; i++) {
-    const chunk_number = errors[i][4]
-    let number_to_add = (chunk_number) * '<br>'.length
-    for (let j = 0; j < chunks.length; j++) {
-      if (j < chunk_number) { number_to_add += chunks[j].length }
+  // Adds underline to each chunk, then smash them together
+
+  let blue_chunks = []
+  let chunks = get_text().split("<br>")
+
+  for (let chunk_index = 0; chunk_index < chunks.length; chunk_index++) {
+    let relevant_errors = errors.filter(error => error[4] === chunk_index);
+    const chunk = chunks[chunk_index]
+
+    let str_to_put_in = []
+    let indexes = []
+
+    for (let i = 0; i < relevant_errors.length; i++) {
+      str_to_put_in.push(`<span class="highlightedWord">${chunk.slice(relevant_errors[i][2][0], relevant_errors[i][2][1])}</span>`);
+      indexes.push([relevant_errors[i][2][0], relevant_errors[i][2][1]])
     }
-    const word = errors[i][0];
-    const lower_bound = errors[i][2][0] + number_to_add
-    const upper_bound = errors[i][2][1] + number_to_add
-    str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
-    indexes.push([lower_bound, upper_bound])
+    blue_chunks.push(make_sentence_red(chunk, str_to_put_in, indexes))
   }
-  const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes)
-  return red_sentence
+  return blue_chunks.join("<br>")
 }
+
+// export function init_make_sentence_red2(sentence, errors) {
+
+//   let chunks = sentence.split("<br>")
+//   let str_to_put_in = []
+//   let indexes = []
+//   for (let i = 0; i < errors.length; i++) {
+//     const chunk_number = errors[i][4]
+//     let number_to_add = (chunk_number) * '<br>'.length
+//     for (let j = 0; j < chunks.length; j++) {
+//       if (j < chunk_number) { number_to_add += chunks[j].length }
+//     }
+//     const word = errors[i][0];
+//     console.log(chunks[chunk_number].slice(errors[i][2][0], errors[i][2][1]))
+//     const lower_bound = errors[i][2][0] + number_to_add
+//     const upper_bound = errors[i][2][1] + number_to_add
+//     str_to_put_in.push(`<span class="highlightedWord">${sentence.slice(lower_bound, upper_bound)}</span>`);
+//     indexes.push([lower_bound, upper_bound])
+//   }
+//   const red_sentence = make_sentence_red(sentence, str_to_put_in, indexes)
+//   console.log(get_text())
+//   console.log(red_sentence)
+//   return red_sentence
+// }
 
 function make_sentence_red(sentence, string_to_put_in, indexes) {
     const emojiIndexes = findEmojiIndexes(sentence);
@@ -137,6 +163,8 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async () => {
+      // const start_time = (new Date()).getTime() / 1000;
+      // console.log((new Date()).getTime() / 1000 - start_time)
       this.sentence_information.current_text = get_text()
       if (!(this.sentence_information.text_at_correction_time === this.sentence_information.current_text)) {
         this.visual_representation.remove()
@@ -146,6 +174,7 @@ export class VisualError {
       let indexes = []
       let chunks = get_text().split("<br>")
       let number_to_add = (this.chunk_number) * '<br>'.length
+      // console.log((new Date()).getTime() / 1000 - start_time)
       for (let j = 0; j < chunks.length; j++) {
         if (j < this.chunk_number) { number_to_add += chunks[j].length }
       }
@@ -156,12 +185,14 @@ export class VisualError {
       this.sentence_information.current_text = correction[0];
       this.visual_representation.remove();
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
+      // console.log((new Date()).getTime() / 1000 - start_time)
       const text = document.getElementById("text")
       this.sentence_information.previous_chunks = correction[0].split("<br>")
       const chunk_before_correction = chunks[this.chunk_number]
       const chunk_after_correction = correction[0].split("<br>")[this.chunk_number]
       // this.sentence_information.errors_matching_text[chunk_after_correction] = this.sentence_information.errors_matching_text[chunk_before_correction]
       delete this.sentence_information.errors_matching_text.chunk_before_correction
+      // console.log((new Date()).getTime() / 1000 - start_time)
     
       let chunk_errors = this.sentence_information.errors_matching_text[chunk_before_correction]
       let errors_other_than_this = []
@@ -172,16 +203,19 @@ export class VisualError {
         }
       }
       this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
+      // console.log((new Date()).getTime() / 1000 - start_time)
       
       text.setHTML(correction[0])
       const textUnderline = document.getElementById("text-underline")
       errors = await unnestErrors(this.sentence_information)
       const red_sentence = init_make_sentence_red(get_text(), errors);
       textUnderline.setHTML(red_sentence)
+      // console.log((new Date()).getTime() / 1000 - start_time)
 
       check_clear_message(this.sentence_information)
       display_errors()
       set_margin()
+      // console.log((new Date()).getTime() / 1000 - start_time)
       });
     return correctWord
   }

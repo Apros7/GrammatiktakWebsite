@@ -43,23 +43,5 @@ async function _fetchData(service_url, text, sentence_information) {
   const errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
   sentence_information.waiting_for_backend[text] = false
   sentence_information.errors_matching_text[text] = errors
-  console.log("ERRORS: ", errors)
   return errors
 }
-
-function create_fetching_error_message() {
-    const rightColumn = document.querySelector(".right-column");
-    document.getElementById("loading-screen").style.display = "none";
-    errorText = document.createElement("div")
-    errorText.classList.add("errorText")
-    errorText.textContent = "Der er desværre sket en fejl på vores side. \nVi er opmærksomme på fejlen og retter den hurtigst muligt!"
-    rightColumn.appendChild(errorText)
-}
-
-// export function handle_fetching_error(status, service_url) {
-//   const correctTextButton = document.querySelector(".submit-button")
-//   // correctTextButton.innerText = "Ret min tekst";
-//   if (status !== "error") {return status}
-//   create_fetching_error_message()
-//   // sent auto feedback in case of error
-// }
