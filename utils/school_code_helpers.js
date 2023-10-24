@@ -2,8 +2,10 @@
 
 function isNumericAndShort(str) { return /^\d+$/.test(str) && str.length < 10; }
 
+const tester_code = "7357"
+
 function code_valid(code) {
-    const codes = ["14187", "240506"] // should be secret, if you found this, hi ;)
+    const codes = ["14187", "240506", tester_code] // should be secret, if you found this, hi ;)
     if (!isNumericAndShort(code)) { return false }
     if (codes.some(c => c === code)) { return true }
     return false
