@@ -2,7 +2,7 @@ import { set_margin } from "./page_control.js";
 
 export function get_text() {
   const current_text = check_font();
-  let html = current_text.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+  let html = current_text.replace(/&nbsp;/g, ' ').replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
   if (html.substring(0, 5) === "<div>") {
     html = html.substring(5)
   }
