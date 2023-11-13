@@ -129,7 +129,7 @@ export async function display_errors() {
   rightColumn.innerHTML = "";
 
   const red_sentence = await init_make_sentence_red(get_text(), uniqueErrors)
-  textUnderline.setHTML(red_sentence)
+  textUnderline.innerHTML = red_sentence
   for (let i = 0; i < uniqueErrors.length; i++) {
     const visualErrorInstance = new VisualError(uniqueErrors[i], sentence_information, i)
     if (should_visualize_id(visualErrorInstance)) {

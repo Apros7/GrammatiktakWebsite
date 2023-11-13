@@ -107,7 +107,7 @@ export class VisualError {
       this.sentence_information.removed_error_ids.push(this.id)
       this.sentence_information.text_at_correction_time = this.sentence_information.current_text;
       const textUnderline = document.getElementById("text-underline")
-      textUnderline.setHTML(red_sentence)
+      textUnderline.innerHTML = red_sentence
       check_clear_message(this.sentence_information)
       set_margin()
     });
@@ -165,11 +165,11 @@ export class VisualError {
       }
       this.sentence_information.errors_matching_text[chunk_after_correction] = errors_other_than_this
       
-      text.setHTML(corrected_sentence)
+      text.innerHTML = corrected_sentence
       const textUnderline = document.getElementById("text-underline")
       errors = await unnestErrors(this.sentence_information)
       const red_sentence = init_make_sentence_red(get_text(), errors);
-      textUnderline.setHTML(red_sentence)
+      textUnderline.innerHTML = red_sentence
 
       check_clear_message(this.sentence_information)
       set_margin()
