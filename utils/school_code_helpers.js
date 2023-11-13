@@ -2,16 +2,17 @@
 
 function isNumericAndShort(str) { return /^\d+$/.test(str) && str.length < 10; }
 
-const tester_code = "7357"
+const tester_code = "1234"
 
 function code_valid(code) {
-    const codes = ["14187", "240506", tester_code] // should be secret, if you found this, hi ;)
+    const codes = ["14187", "240506", tester_code] // should be secret, if you found this, hi ;) // azure functions
     if (!isNumericAndShort(code)) { return false }
     if (codes.some(c => c === code)) { return true }
     return false
 }
 
 function check_code(with_display) {
+    document.getElementById("school-data").innerHTML = ""
     const schoolDataInput = document.getElementById("school-data-input");
     const schoolDataButton = document.getElementById("school-data-button");
 
@@ -51,7 +52,7 @@ export function display_school() {
     if (!code_valid(document.getElementById("school-data-input").value)) { return }
 
     const data_from_school = { // this should be returned from RESTapi
-        "name": "Herning Gymnasium DA01",
+        "name": "_____ Gymnasium DA01",
         "scores": {
             "Nutids-r": 25,
             "Stavefejl": 90,
@@ -126,6 +127,12 @@ function display_school_data(data) {
         col2.appendChild(slider_text)
         col2.appendChild(slider_container)
     }
+
+    const averageLineText = document.createElement("div");
+    averageLineText.classList.add("slider-text")
+    averageLineText.innerHTML = '<span style="color: red; font-size: 20px; font-weight: bold;">l</span> = gennemsnit af alle skoler';
+    col2.appendChild(averageLineText);
+
     school_data_information.appendChild(col2)
     school_data.appendChild(school_data_information)
 }
