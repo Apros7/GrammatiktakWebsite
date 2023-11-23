@@ -128,3 +128,46 @@ body {
     margin: 0;
     color: #fff;
 }
+
+.container {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+}
+
+.item {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.item:last-child {
+    margin-bottom: 0;
+}
+
+.number {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: #3B82F6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    font-weight: 700;
+}
+
+.title {
+    max-width: 600px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+}
+
+.description {
+    max-width: 600px;
+    margin-top: 0.25rem;
+}
