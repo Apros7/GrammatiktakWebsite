@@ -13,7 +13,7 @@ body {
 }
 .navbar .LogoText {
   color: black;
-  font-size: 1.6em;
+  font-size: 2em;
   font-weight: bold;
 }
 .navbar .LogoText span {
@@ -384,4 +384,10 @@ body {
 
 .edit-or-enter-button:hover {
   background-color: #555;
+}
+
+.text-field {
+  margin-left: 20px; /* Adjust the margin as needed */
+  font-size: 16px; /* Adjust the font size as needed */
+  padding: 5px;
 }
