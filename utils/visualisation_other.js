@@ -71,7 +71,9 @@ export function check_clear_message(sentence_information) {
     rightColumn.innerHTML = ""
     let allClearText = document.createElement("div")
     allClearText.classList.add("allClearText")
-    allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
+    allClearText.innerHTML = "Grammatiktak er pt lukket. Hvis du vil bruge Grammatiktak på din egen computer, så skriv til mig på lucas.vilsen@gmail.com. Jeg beklager"
+    allClearText.style.color = "red"
+    //allClearText.textContent = "Det ser ud til, at din tekst er fejlfri 😊."
     rightColumn.appendChild(allClearText)
   }
 }
