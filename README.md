@@ -1,4 +1,4 @@
-# apros7.github.io
+# GrammatikTAK! Website
 This is the frontend script for the website at GrammatikTAK.com. 
 The website is not longer public, but can be run from this repo if wanted. Run the index.html file locally to see the website.
 
