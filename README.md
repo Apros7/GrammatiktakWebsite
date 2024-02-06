@@ -1,5 +1,6 @@
 # apros7.github.io
 This is the frontend script for the website at GrammatikTAK.com. 
+The website is not longer public, but can be run from this repo if wanted. Run the index.html file locally to see the website.
 
 ## Todo:
 - [x] see measurements based on each school, maybe this should be avaliable for schools to check at all times. @https://grammatiktak.com/data
