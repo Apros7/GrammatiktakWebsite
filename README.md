@@ -2,6 +2,7 @@
 This is the frontend script for the Grammatiktak project. 
 
 ![image](Grammatiktak.png)
+![image](grammatiktak_website2.png)
 
 The website is not longer public, but can be run from this repo if wanted. Run the index.html file locally to see the website.
 
